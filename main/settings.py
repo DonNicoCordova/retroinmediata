@@ -39,7 +39,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'retro_auth',
-    'retro'
+    'retro',
+    'minutas',
+    'alertas',
+    'auditorias'
 ]
 
 MIDDLEWARE = [

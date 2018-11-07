@@ -23,6 +23,9 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('auth/', include('retro_auth.urls'), name='auth'),
     path('', include('retro.urls'), name='retro'),
+    path('Minutas/', include('minutas.urls'), name='minutas'),
+    path('Alertas/', include('alertas.urls'), name='alertas'),
+    path('Auditorias/', include('auditorias.urls'), name='auditorias'),
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
