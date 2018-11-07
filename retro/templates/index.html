@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block stylesheet %}
+
+<link href="{% static 'css/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/chosen/bootstrap-chosen.css' %}" rel="stylesheet">
+<link href="{% static 'css/ios.css' %}" rel="stylesheet">
+<link href="{% static 'css/styles.css' %}" rel="stylesheet">
+
+{% endblock stylesheet %}
+
+
+{% block breadcrumb %}
+<div class="row wrapper border-bottom white-bg page-heading" style="padding-bottom: 0px;">
+    <div class="col-lg-10">
+        <h2>Dashboard</h2>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+{% endblock breadcrumb %}
+{% block content %}
+
+<div class="row">
+    <div class="col-md-12 col-lg-12 col-xs-12">
+    {% if messages %}
+    {% for message in messages %}
+        <div {% if message.tags %} class="{{ message.tags }} alert alert-danger alert-dismissable" {% endif %}>
+            <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+            {{message}}.
+        </div>
+    {% endfor %}
+    {% endif %}
+    </div>
+    {% for section in sections%}
+    <div class="col-lg-6 col-md-6 col-xs-12">
+        {% if section.0.section_type == "CA" %}
+        <div class="panel panel-success">
+        {% else %}    
+        <div class="panel panel-danger">
+        {% endif %}
+            <div class="panel-heading">
+                Asignatura: {{section.0.subject.name}}
+            </div>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-xs-12 col-md-12 col-lg-12">
+                        <dl class="dl-horizontal">
+                            <div class="col-xs-6 col-md-12 col-lg-12">
+                                {% if section.0.section_type == "CA" %}
+                                <dt>Tipo:</dt> <dd><span class="label label-primary">Catedra</span></dd>
+                                {% else %}
+                                <dt>Tipo:</dt> <dd><span class="label label-warning">Ayudantia</span></dd>
+                                {% endif %}
+                                <dt>Docente:</dt> <dd>{{section.0.teacher.name}}</dd>
+                            </div>
+                            <div class="col-xs-6 col-md-12 col-lg-12">
+                                <dt>Código Asignatura:</dt> <dd>{{section.0.subject.subject_code}}</dd>
+                                <dt>Nrc:</dt> <dd>{{section.0.nrc}}</dd>
+                            </div>
+                        </dl>
+                    </div>
+                    <div class="col-xs-12 col-md-12 col-lg-12 horarios">
+                        <h3 style="text-align:center;padding-top:2%">Horarios:</h3>
+                        <hr style="margin-top:1px">
+                        <dl class="dl-horizontal">
+                            {% if section.1 == "Sin Horario" %}
+                            <p>{{section.1}}</p>
+                            {% else %}
+                                {% for schedule in section.1 %}
+                                <dt>{{schedule.0}}:</dt> <dd>{{schedule.1}} ({{schedule.2}})</dd>
+                                {% endfor %}
+                            {% endif %}
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-footer">
+                <a class="btn btn-primary btn-rounded btn-block" href="{% url 'section_details' section.0.pk %}"><i class="fa fa-eye"></i> Punto de encuentro</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock content %}
+
+
+{% block javascript %}
+<script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+<script>
+    
+</script>
+
+
+{% endblock javascript %}
