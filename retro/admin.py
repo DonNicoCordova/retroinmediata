@@ -1,30 +1,21 @@
 from django.contrib import admin
-from django import forms
-from .models import Subject,Section,Post,Comment
-
-class SubjectForm(forms.ModelForm):
-    class Meta:
-        model = Subject
-        fields = '__all__'
+from .models import Subject, Section, Post, Comment, Threshold, UserType, Career, CareerSubjectSection, Student, Thread, ThreadRanking, ThreadFollower, PostFollower, PostRanking, CommentArchive, CommentRanking
 
 
-class SubjectAdmin(admin.ModelAdmin):
-    form = SubjectForm
-    list_display = ['api_pk','name']
-
-admin.site.register(Subject, SubjectAdmin)
-
-class SectionForm(forms.ModelForm):
-    class Meta:
-        model = Section
-        fields = '__all__'
-
-
-class SectionAdmin(admin.ModelAdmin):
-    form = SectionForm
-    list_display = ['section_type','api_pk','teacher','subject']
-    list_filter = ['subject','section_type','teacher']
-    search_fields = ['nrc']
-
-admin.site.register(Section, SectionAdmin)
+admin.site.register(Section)
+admin.site.register(Post)
+admin.site.register(Subject)
+admin.site.register(Comment)
+admin.site.register(Threshold)
+admin.site.register(UserType)
+admin.site.register(Career)
+admin.site.register(CareerSubjectSection)
+admin.site.register(Student)
+admin.site.register(Thread)
+admin.site.register(ThreadRanking)
+admin.site.register(ThreadFollower)
+admin.site.register(PostFollower)
+admin.site.register(PostRanking)
+admin.site.register(CommentArchive)
+admin.site.register(CommentRanking)
 # Register your models here.
