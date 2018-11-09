@@ -46,6 +46,7 @@ def auth_login(request):
                 os.getenv("AUTH_URL")+'/get/get_user_info/', headers=header, data=post_data)
             content_2 = json.loads(response_2.content.decode("utf-8"))
             content_2 = content_2['user_info']
+            print (content_2)
             request.session["user_pk"] = content_1['pk']
             request.session["username"] = username
             request.session["rut"] = content_2['user_rut']
@@ -82,17 +83,12 @@ def auth_login(request):
                         profile = UserProfile.objects.get(
                             rut = content_2['user_rut']
                         )
-                        profile.api_pk = content_1["pk"]
                         profile.user = n_usuario
                         profile.save()
 
                     except UserProfile.DoesNotExist:
                         profile = UserProfile.objects.create(
-                            api_pk = content_1['pk'],
                             user=n_usuario,
-                            name=full_name,
-                            user_type="AL",
-                            carreer=content_2["carreer_pk"],
                             rut=content_2['user_rut'],
                         )
                         profile.save()
@@ -103,17 +99,12 @@ def auth_login(request):
                         profile = UserProfile.objects.get(
                             rut = content_2['user_rut']
                         )
-                        profile.api_pk = content_1["pk"]
                         profile.user = n_usuario
                         profile.save()
 
                     except UserProfile.DoesNotExist:
                         profile = UserProfile.objects.create(
-                            api_pk = content_1['pk'],
                             user=n_usuario,
-                            name=full_name,
-                            user_type="DO",
-                            carreer=content_2["carreer_pk"],
                             rut=content_2['user_rut'],
                         )
                         profile.save()
