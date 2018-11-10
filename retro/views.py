@@ -117,5 +117,7 @@ def delete_post(request, post_id):
     data = {}
     template_name = 'section_details.html'
     data['post'] = Post.objects.all()
+    comment = Comment.objects.filter(post = post_id).delete()
     Post.objects.get(pk=post_id).delete()
     return HttpResponseRedirect(reverse('section_details'))
+#ESTA FUNCION NO SABÍA COMO FILTRAR LOS COMENTARIOS DEL POST QUE SE ESTA BORRANDO, NECESITO PROBARLO PARA SABER SI FUNCIONA
