@@ -23,7 +23,7 @@ module_dict = {"D1":"08:30 - 10:10", "D2":"10:20 - 12:00",
                "V3":"20:40 - 22:20"}
 
 
-@login_required(login_url='/auth/login/')
+# @login_required(login_url='/auth/login/')
 def index(request):
 	data = {}
 	profile = UserProfile.objects.get(user=request.user,user_type=request.session['type'])
@@ -31,7 +31,7 @@ def index(request):
 		sections = Section.objects.filter(Q(students=profile))
 	else:
 		sections = Section.objects.filter(Q(teacher=profile))
-		 
+
 	data['sections'] = []
 	for section in sections:
 		if section.schedule != "Sin Horario":
@@ -44,7 +44,7 @@ def index(request):
 				time = module_dict[time]
 				classroom = schedule.split(";")[1]
 				output.append([day,time,classroom])
-				
+
 			data['sections'].append([section,output])
 		else:
 			data['sections'].append([section,section.schedule])
@@ -56,7 +56,7 @@ def index(request):
 def section_details(request,pk):
 	template_name = 'section_details.html'
 	data = {}
-	
+
 	if Section.objects.filter(pk=pk).exists():
 		section = Section.objects.get(pk=pk)
 		if section.schedule != "Sin Horario":
@@ -69,7 +69,7 @@ def section_details(request,pk):
 				time = module_dict[time]
 				classroom = schedule.split(";")[1]
 				output.append([day,time,classroom])
-				
+
 			data['section'] = [section,output]
 		else:
 			data['section'] = [section,section.schedule]
@@ -78,6 +78,36 @@ def section_details(request,pk):
 		messages.error(request, 'No existe la sección.')
 		return HttpResponseRedirect(reverse('index'))
 
-		
+
 	return render(request, template_name, data)
 
+def edit_Post(request,pk_Post):
+        post = Post.objects.get(pk=pk_Post)
+        if request.method == 'GET':
+            form = PostForm(instance=post)
+        else:
+            form = PostForm(request.POST,instance=post)
+            if form.is_valid():
+                form.save()
+                #redirect que no se cual es
+            return redirect('../')
+            #redirect que no se cual es tampoco en los ''
+        return render(request,'',{'form':form})
+    else:
+        return redirect('index')
+
+def edit_Comment(request,pk_Comment):
+        comment = Comment.objects.get(pk=pk_Comment)
+        if request.method == 'GET':
+            form = CommentForm(instance=comment)
+        else:
+            form = CommentForm(request.POST,instance=comment)
+            if form.is_valid():
+                form.save()
+                #redirect que no se cual es
+            return redirect('../')
+            #redirect que no se cual es tampoco en los ''
+        return render(request,'',{'form':form})
+    else:
+        # no se si redirecciona a index
+        return redirect('index')
