@@ -4,14 +4,12 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
-from retro_auth.models import UserProfile
 from django.contrib import messages
-from .models import Section, Subject, Thread
-from .forms import ThreadForms
 from django.db.models import Q
-import requests
-import json
-import os
+from retro_auth.models import UserProfile
+from retro.forms import post_form, post_form_document
+from .models import Section, Thread, Comment, CommentArchive, Post
+from .forms import ThreadForms
 
 # Create your views here.
 
@@ -26,10 +24,10 @@ module_dict = {"D1": "08:30 - 10:10", "D2": "10:20 - 12:00",
                "V3": "20:40 - 22:20"}
 
 
-@login_required(login_url='/auth/login/')
+#@login_required(login_url='/auth/login/')
 def index(request):
     # data = {}
-    # profile = UserProfile.objects.get(user=request.user,user_type=request.session['type'])
+    # profile = UserProfile.objects.get(user=request.user,user_type=request.Sections['type'])
     # if request.session['type'] == "AL":
     # 	sections = Section.objects.filter(Q(students=profile))
     # else:
@@ -109,4 +107,42 @@ def section_details(request, pk):
         messages.error(request, 'No existe la sección.')
         return HttpResponseRedirect(reverse('index'))
 
+    return render(request, template_name, data)
+
+def create_comment_archives(new_comment,File):
+    try:
+        archive = CommentArchive(comment=new_comment, document= File)
+        archive.save()
+    except:
+        pass
+
+
+def post(request):
+    data={}
+    post = Post.objects.get(pk=1)
+    all_comment = Comment.objects.filter(post=post)
+
+    lista_coment = []
+    file = ""
+    for i in all_comment:
+        try:
+            file = CommentArchive.objects.get(comment = i)
+            lista_coment.append([i,file])
+        except:
+            lista_coment.append([i,""])
+    us = UserProfile.objects.get(user = request.user)
+    data['comm'] = lista_coment
+    if request.method == "POST":
+        data['form'] = post_form(request.POST)
+        if data['form'].is_valid():
+            new_comment = Comment(post=post,description=request.POST['description'],author=us)
+            new_comment.save()
+            create_comment_archives(new_comment,request.FILES['document'])
+            return HttpResponseRedirect(reverse('post'))
+
+    else:
+        data['form'] = post_form()
+        data['form_arch'] = post_form_document()
+
+    template_name = 'Post.html'
     return render(request, template_name, data)
