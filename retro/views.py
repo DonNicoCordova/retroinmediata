@@ -110,3 +110,12 @@ def section_details(request, pk):
         return HttpResponseRedirect(reverse('index'))
 
     return render(request, template_name, data)
+
+
+@login_required(login_url='/auth/login/')
+def delete_post(request, post_id):
+    data = {}
+    template_name = 'section_details.html'
+    data['post'] = Post.objects.all()
+    Post.objects.get(pk=post_id).delete()
+    return HttpResponseRedirect(reverse('section_details'))
