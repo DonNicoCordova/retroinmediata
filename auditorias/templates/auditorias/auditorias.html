@@ -75,6 +75,15 @@
                 {%for x in umbral %}
                 <h1>Nombre:{{x.user}} Rut: {{x.rut}} Umbral:{{x.umbral}}</h1>
                 {% endfor %}
+
+                <!-- {%for y in publish_date %}
+                <h1>Fecha:{{y.publish_date}}</h1>
+                {% endfor %} -->
+
+                {%for z in date %}
+                <h2>Fecha:{{z.publish_date}}</h2>
+                {% endfor %}
+
         </div>
         {% block breadcrumb %}{% endblock breadcrumb %}
             <div class="wrapper wrapper-content">
