@@ -1,13 +1,32 @@
 {% extends "base.html" %}
 {% load static %}
-
+{% load retroTags %}
 {% block stylesheet %}
 
 <link href="{% static 'css/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet">
 <link href="{% static 'css/plugins/chosen/bootstrap-chosen.css' %}" rel="stylesheet">
 <link href="{% static 'css/ios.css' %}" rel="stylesheet">
 <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+  <style>
+    .modal {
+    text-align: center;
+    padding: 0!important;
+  }
 
+  .modal:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+    margin-right: -4px;
+  }
+
+  .modal-dialog {
+    display: inline-block;
+    text-align: left;
+    vertical-align: middle;
+  }
+  </style>
 {% endblock stylesheet %}
 
 
@@ -26,9 +45,9 @@
 <div class="row">
     <div class="col-md-12 col-lg-12 col-xs-12" style="text-align: center">
         <button type="button" class="btn btn-w-m btn-primary" id="info_tab"><i class="fa fa-info"></i> Información</button>
-        <button type="button" class="btn btn-w-m btn-info" id="comment_tab"><i class="fa fa-pencil"></i>Comentarios</button>
+        <button type="button" class="btn btn-w-m btn-info" id="comment_tab"><i class="fa fa-comments"></i> Hilos</button>
     </div>
-    <div id="information">
+    <div id="information" style="display: none">
         <div class="col-md-12 col-xs-12 col-lg-12 " style="padding-top:2%">
             <div class="panel panel-primary">
                 <div class="panel-heading">
@@ -115,97 +134,113 @@
             </div>
         </div>
     </div>
-    <div id="commentaries" style="display:none">
+    <div id="commentaries">
         <div class="col-lg-12">
             <div class="wrapper wrapper-content animated fadeInRight">
-                <div class="vote-item">
-                    <div class="row">
-                        <div class="col-md-10">
-                            <div class="vote-actions">
-                                <a href="#">
-                                    <i class="fa fa-chevron-up"> </i>
-                                </a>
-                                <div>32</div>
-                                <a href="#">
-                                    <i class="fa fa-chevron-down"> </i>
-                                </a>
-                            </div>
-                            <a href="#" class="vote-title">
-                                It is a long established fact that a reader will be distracted
-                            </a>
-                            <div class="vote-info">
-                                <i class="fa fa-comments-o"></i> <a href="#">Comments (32)</a>
-                                <i class="fa fa-clock-o"></i> <a href="#">1 Hours ago</a>
-                                <i class="fa fa-user"></i> <a href="#">Andrew Williams</a>
-                            </div>
-                        </div>
-                        <div class="col-md-2 ">
-                            <div class="vote-icon">
-                                <i class="fa fa-css3"> </i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="vote-item">
-                    <div class="row">
-                        <div class="col-md-10">
-                            <div class="vote-actions">
-                                <a href="#">
-                                    <i class="fa fa-chevron-up"> </i>
-                                </a>
-                                <div>15</div>
-                                <a href="#">
-                                    <i class="fa fa-chevron-down"> </i>
-                                </a>
-                            </div>
-                            <a href="#" class="vote-title">
-                                Many desktop publishing packages and web page
-                            </a>
-                            <div class="vote-info">
-                                <i class="fa fa-comments-o"></i> <a href="#">Comments (11)</a>
-                                <i class="fa fa-clock-o"></i> <a href="#">4 Hours ago</a>
-                                <i class="fa fa-user"></i> <a href="#">Monica Smith</a>
-                            </div>
-                        </div>
-                        <div class="col-md-2 ">
-                            <div class="vote-icon">
-                                <i class="fa fa-github"> </i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="vote-item">
-                    <div class="row">
-                        <div class="col-md-10">
-                            <div class="vote-actions">
-                                <a href="#">
-                                    <i class="fa fa-chevron-up"> </i>
-                                </a>
-                                <div>8</div>
-                                <a href="#">
-                                    <i class="fa fa-chevron-down"> </i>
-                                </a>
-                            </div>
-                            <a href="#" class="vote-title">
-                                There are many variations of passages of Lorem Ipsum available, but the majority have
-                            </a>
-                            <div class="vote-info">
-                                <i class="fa fa-comments-o"></i> <a href="#">Comments (7)</a>
-                                <i class="fa fa-clock-o"></i> <a href="#">6 Hours ago</a>
-                                <i class="fa fa-user"></i> <a href="#">Mike Nort</a>
-                            </div>
-                        </div>
-                        <div class="col-md-2 ">
-                            <div class="vote-icon">
-                                <i class="fa fa-git"> </i>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+            {% if request|PrivilegeCreateThread:section.pk %}
+              <div class="col-md-12">
+                <form action="{% url 'section_details' section.pk %}" class="form-horizontal" method="get">
+                  <div class="form-group col-md-8">
+                    <input type="text" name="search" id="id_search" class="form-control" placeholder="Buscar..." value="{{searchFilter|cut:'&search='}}">
+                  </div>
+                  <div class="col-md-2">
+                    <button type="submit" class="btn btn-success btn-block" data-toggle="modal" data-target="#addThread"><i class="fa fa-search"></i> Buscar</button>
+                  </div>
+                  <div class="col-md-2">
+                    <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#addThread"><i class="fa fa-plus"></i> Crear Hilo</button>
+                  </div>
+                </form>
+              </div>
+            {% endif %}
+              <div class="col-md-12">
+                {% for x in threadpage %}
+                  <div class="vote-item">
+                      <div class="row">
+                          <div class="col-md-10">
+                              <div class="vote-actions">
+                                  <a href="#">
+                                      <i class="fa fa-chevron-up"> </i>
+                                  </a>
+                                  <div>32</div>
+                                  <a href="#">
+                                      <i class="fa fa-chevron-down"> </i>
+                                  </a>
+                              </div>
+                              <a href="#" class="vote-title">
+                                  {{ x.name }}
+                              </a>
+                              <div class="vote-info">
+                                  <i class="fa fa-question-circle-o"></i> <a href="#">Preguntas ({{ x.post_set.all.count }})</a>
+                                  <i class="fa fa-clock-o"></i> <a href="#">{% with x.getDiference as difference %} {{ difference }} {% if difference == 1 %}Hora{% else %}Horas{% endif %} atrás {% endwith %}</a>
+  {#                                <i class="fa fa-user"></i> <a href="#">Andrew Williams</a>#}
+                              </div>
+                          </div>
+                          <div class="col-md-2 ">
+                              <div class="vote-icon">
+                                  <i class="fa fa-css3"> </i>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+                {% endfor %}
+              </div>
             </div>
         </div>
+        <div class="row text-center">
+          <ul class="pagination">
+            {% if threadpage.has_previous %}
+            <li class="page-item">
+              <a class="page-link" href="?page={{ threadpage.previous_page_number }}{{searchFilter}}">Anterior</a>
+            </li>
+            {% else %}
+            <li class="page-item disabled">
+              <a class="page-link">Anterior</a>
+            </li>
+            {% endif %} {% if threadpage.number|add:'-4' > 1 %}
+            <li><a href="?page={{ threadpage.number|add:'-5' }}{{searchFilter}}">&hellip;</a></li>
+            {% endif %} {% for i in threadpage.paginator.page_range %} {% if threadpage.number == i %}
+            <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+            {% elif i > threadpage.number|add:'-5' and i < threadpage.number|add:'5' %} <li><a href="?page={{ i }}{{searchFilter}}">{{i}}</a></li>
+              {% endif %} {% endfor %} {% if threadpage.paginator.num_pages > threadpage.number|add:'4' %}
+              <li><a href="?page={{ threadpage.number|add:'5' }}{{searchFilter}}">&hellip;</a></li>
+              {% endif %} {% if threadpage.has_next %}
+              <li class="page-item">
+                <a class="page-link" href="?page={{ threadpage.next_page_number }}{{searchFilter}}">Siguiente</a>
+              </li>
+              {% else %}
+              <li class="page-item disabled">
+                <a class="page-link">Siguiente</a>
+              </li>
+              {% endif %}
+          </ul>
+        </div>
     </div>
+</div>
+<div class="modal inmodal fade" id="addThread" tabindex="-1" role="dialog"  aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+        <form action="{% url 'section_details' section.pk %}" class="form-horizontal" method="post">
+          {% csrf_token %}
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <h4 class="modal-title">Modal title</h4>
+              <small class="font-bold">Lorem Ipsum is simply dummy text of the printing and typesetting industry.</small>
+          </div>
+          <div class="modal-body">
+
+              <div class="form-group">
+                <label class="control-label">Nombre del Hilo:</label>
+                  {{ threadform.name }}
+              </div>
+          </div>
+
+          <div class="modal-footer">
+              <button type="button" class="btn btn-white" data-dismiss="modal">Cerrar</button>
+              <button type="submit" class="btn btn-primary">Crear Hilo</button>
+          </div>
+        </form>
+      </div>
+  </div>
 </div>
 
 {% endblock content %}
@@ -230,7 +265,10 @@
                 actual = "#information"
             }
         });
-    });  
+    });
+    {% if not threadform %}
+      $("#addThread").modal()
+    {% endif  %}
 </script>
 
 
