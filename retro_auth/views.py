@@ -25,7 +25,7 @@ def auth_login(request):
             'password': request.POST["password"]
         }
         response = requests.post(
-            os.getenv("AUTH_URL")+"/rest-auth/login/", data=post_data)
+            os.getenv("AUTH_URL")+str("/rest-auth/login/"), data=post_data)
         content = response.content.decode('utf-8')
         content = json.loads(content)
         if "key" in content:
