@@ -1,0 +1,27 @@
+{% load static %}
+
+<ul class="nav metismenu" id="side-menu">
+    <li class="nav-header">
+        <div class="dropdown profile-element">
+                <span>
+                    <a href="#">
+                        <img  class="center-block img-responsive" src="{% static 'logo.png' %}" style="width: 80px;" />
+                    </a>
+                </span><br>
+                <h4 class="text-center" style="color:#FFF;">Plataforma de Retroalimentación</h4>
+        </div>
+        <div class="logo-element">
+            Retro
+        </div>
+    </li>
+
+    <li>
+        <a href="{% url 'index' %}"><i class="fa fa-home"></i> <span class="nav-label">Inicio</span></a>
+    </li>
+    <li>
+        <a href="" disabled><i class="fa fa-book "></i> <span class="nav-label">Mis asignaturas</span></a>
+    </li>
+    <li>
+        <a href="" disabled><i class="fa fa-book "></i> <span class="nav-label">Historial de auditorias</span></a>
+    </li>
+</ul>
