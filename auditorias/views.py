@@ -8,46 +8,40 @@ def auditorias(request):
     lista = []
     unico = []
     repetido= []
-    con = []
-    nel = []
+    lista1 = []
     contador = 0
+    
     for x in Post.objects.all():
         lista.append(x.title)
-        for z in lista:
-            if z not in unico:
-                unico.append(z)
-            else:
-                if z not in repetido:
-                    repetido.append(z)
-                    contador += 1
+
+    for z in lista:
+        if z not in unico:
+            unico.append(z)
+        else:
+            if z not in repetido:
+                repetido.append(z)
+                contador += 1
+                
+
     print (contador)
     print (repetido)
+    print('\n')
+    print(lista)
 
-    keywords = "buena los cabros".split(" ") 
     keywords_2 = "buena los cabros".split(" ")
-    print(keywords)
+    #keywords_2 = ['buena los cabros']
     print(keywords_2)
-    if keywords == keywords_2:
-        print("vahj")
-    else: 
-        print("novahj")
 
-    for i in keywords:
-        for z in keywords_2:
-            if i == z:
-                con.append(i)
-            else:
-                nel.append(z)
-            
-    print(con)
+    for i in lista:
+        print(i)
+        for m in keywords_2:
+            if i == m:
+                lista1.append(i)
     
-    """if len(keywords) == len(con):
-        print("Preguntas similares")
-    else:
-        print("diferentes")"""
+    print(lista1)
     
-    porcentaje1 = 100*len(con)/len(keywords)
-    porcentaje2 = 100*len(con)/len(keywords)
+    porcentaje1 = 100*len(lista1)/len(keywords_2) #66.6%
+    print(porcentaje1)
 
     if porcentaje1 > 65:
         print("Similar")
@@ -55,12 +49,9 @@ def auditorias(request):
         print("No similares")
     
 
-    
 
-    
-        
     return render(request, "auditorias/auditorias.html", {"umbral":UserProfile.objects.all(), "date":Post.objects.all(), "parametros":contador,
-                    "parametros_rep":repetido})
+                    "parametros_rep":repetido, "parametros_rep2":porcentaje1})
 
 
     
