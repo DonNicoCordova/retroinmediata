@@ -7,4 +7,5 @@ urlpatterns = [
     path('Post', views.post, name="post"),
 	path('question/', views.question, name="question"),
     path('forum/', views.forum, name="forum"),
+    path('comment_post/', views.comment_post, name="comment_post"),
 ]

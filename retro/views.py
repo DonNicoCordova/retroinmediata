@@ -12,7 +12,8 @@ from retro_auth.models import UserProfile
 from retro.forms import post_form, post_form_document
 from .models import Section, Thread, Comment, CommentArchive, Post
 from .forms import ThreadForms
-
+import re
+from django.views.decorators.csrf import csrf_exempt
 # Create your views here.
 
 
@@ -150,108 +151,143 @@ def post(request):
     return render(request, template_name, data)
 
 def question(request):
-        template_name = 'question.html'
+	template_name = 'question.html'
 
-        #For Testing
-        user = UserProfile.objects.get(rut="111111111")
-        questionPk = 1
+	#For Testing
+	user = UserProfile.objects.get(rut="111111111")
+	questionPk = 1
 
-        comments = Comment.objects.filter(post=questionPk)
+	comments = Comment.objects.filter(post=questionPk)
 
-        listComments = []
-        for i in comments:
-            rankingSum = 0
-            rankingAvg = 0.0
-            numRatings = 0
-            rankings = CommentRanking.objects.filter(comment=i)
+	listComments = []
+	for i in comments:
+		rankingSum = 0
+		rankingAvg = 0.0
+		numRatings = 0
+		rankings = CommentRanking.objects.filter(comment=i)
 
-            for j in rankings:
-                rankingSum += j.rating
-                numRatings += 1
+		for j in rankings:
+			rankingSum += j.rating
+			numRatings += 1
 
-            if (numRatings != 0):
-                rankingAvg = rankingSum / numRatings
+		if (numRatings != 0):
+			rankingAvg = rankingSum / numRatings
 
-            listComments.append(tuple((i,rankingAvg)))
+		listComments.append(tuple((i,rankingAvg)))
 
-        if request.POST:
-            if CommentRanking.objects.filter(userprofile=user.id,comment=request.POST["comment"]).exists():
-                crank = CommentRanking.objects.get(userprofile=user.id,comment=request.POST["comment"])
-                crank.rating = request.POST["rating"]
-            else:
-                comment = Comment.objects.get(pk=request.POST["comment"])
-                crank = CommentRanking(userprofile=user,comment=comment,rating=request.POST["rating"])
+	if request.POST:
+		if CommentRanking.objects.filter(userprofile=user.id,comment=request.POST["comment"]).exists():
+			crank = CommentRanking.objects.get(userprofile=user.id,comment=request.POST["comment"])
+			crank.rating = request.POST["rating"]
+		else:
+			comment = Comment.objects.get(pk=request.POST["comment"])
+			crank = CommentRanking(userprofile=user,comment=comment,rating=request.POST["rating"])
 
-            crank.save()
-            comments = Comment.objects.filter(post=questionPk)
-            dictRatings = {}
+		crank.save()
+		comments = Comment.objects.filter(post=questionPk)
+		dictRatings = {}
 
-            for i in comments:
-                rankingSum = 0
-                rankingAvg = 0.0
-                numRatings = 0
-                rankings = CommentRanking.objects.filter(comment=i)
+		for i in comments:
+			rankingSum = 0
+			rankingAvg = 0.0
+			numRatings = 0
+			rankings = CommentRanking.objects.filter(comment=i)
 
-                for j in rankings:
-                    rankingSum += j.rating
-                    numRatings += 1
-                if (numRatings != 0):
-                    rankingAvg = rankingSum / numRatings
-                    dictRatings[i.pk] = rankingAvg
-            #print (request.POST["rating"])
-            return JsonResponse(dictRatings)
-        return render(request, template_name, {"Comments":listComments})
+			for j in rankings:
+				rankingSum += j.rating
+				numRatings += 1
+			if (numRatings != 0):
+				rankingAvg = rankingSum / numRatings
+				dictRatings[i.pk] = rankingAvg
+		#print (request.POST["rating"])
+		return JsonResponse(dictRatings)
+	return render(request, template_name, {"Comments":listComments,'Postpk':questionPk})
 
 def forum(request):
-        template_name = 'forum.html'
+	template_name = 'forum.html'
 
-        #For Testing
-        user = UserProfile.objects.get(rut="111111111")
-        sectionPk = 1
-        questionPk = 1
-        allThreads = Thread.objects.filter(section=sectionPk)
-        section = Section.objects.get(pk=allThreads[0].section.id)
-        sectionNRC = section.nrc
+	#For Testing
+	user = UserProfile.objects.get(rut="111111111")
+	sectionPk = 1
+	questionPk = 1
+	allThreads = Thread.objects.filter(section=sectionPk)
+	section = Section.objects.get(pk=allThreads[0].section.id)
+	sectionNRC = section.nrc
 
-        listThreads = []
-        for i in allThreads:
-            rankingSum = 0
-            rankingAvg = 0.0
-            numRatings = 0
-            rankings = ThreadRanking.objects.filter(thread=i)
+	listThreads = []
+	for i in allThreads:
+		rankingSum = 0
+		rankingAvg = 0.0
+		numRatings = 0
+		rankings = ThreadRanking.objects.filter(thread=i)
 
-            for j in rankings:
-                rankingSum += j.rating
-                numRatings += 1
+		for j in rankings:
+			rankingSum += j.rating
+			numRatings += 1
 
-            if (numRatings != 0):
-                rankingAvg = rankingSum / numRatings
+		if (numRatings != 0):
+			rankingAvg = rankingSum / numRatings
 
-            listThreads.append(tuple((i,rankingAvg)))
+		listThreads.append(tuple((i,rankingAvg)))
 
-        if request.POST:
-            if ThreadRanking.objects.filter(userprofile=user.id,thread=request.POST["thread"]).exists():
-                trank = ThreadRanking.objects.get(userprofile=user.id,thread=request.POST["thread"])
-                trank.rating = request.POST["rating"]
-            else:
-                thread = Comment.objects.get(pk=request.POST["thread"])
-                trank = ThreadRanking(userprofile=user,thread=thread,rating=request.POST["rating"])
-            trank.save()
-            allThreads = Comment.objects.filter(post=questionPk)
-            dictRatings = {}
+	if request.POST:
+		if ThreadRanking.objects.filter(userprofile=user.id,thread=request.POST["thread"]).exists():
+			trank = ThreadRanking.objects.get(userprofile=user.id,thread=request.POST["thread"])
+			trank.rating = request.POST["rating"]
+		else:
+			thread = Comment.objects.get(pk=request.POST["thread"])
+			trank = ThreadRanking(userprofile=user,thread=thread,rating=request.POST["rating"])
+		trank.save()
+		allThreads = Comment.objects.filter(post=questionPk)
+		dictRatings = {}
 
-            for i in allThreads:
-                rankingSum = 0
-                rankingAvg = 0.0
-                numRatings = 0
-                rankings = CommentRanking.objects.filter(comment=i)
+		for i in allThreads:
+			rankingSum = 0
+			rankingAvg = 0.0
+			numRatings = 0
+			rankings = CommentRanking.objects.filter(comment=i)
 
-                for j in rankings:
-                    rankingSum += j.rating
-                    numRatings += 1
-                if (numRatings != 0):
-                    rankingAvg = rankingSum / numRatings
-                    dictRatings[i.pk] = rankingAvg
-            #print (request.POST["rating"])
-            return JsonResponse(dictRatings)
-        return render(request, template_name, {"Threads":listThreads,"SectionNRC":sectionNRC})
+			for j in rankings:
+				rankingSum += j.rating
+				numRatings += 1
+			if (numRatings != 0):
+				rankingAvg = rankingSum / numRatings
+				dictRatings[i.pk] = rankingAvg
+		#print (request.POST["rating"])
+		return JsonResponse(dictRatings)
+	return render(request, template_name, {"Threads":listThreads,"SectionNRC":sectionNRC})
+
+@csrf_exempt
+def comment_post(request):
+	if request.method == "POST":
+		print("Entre al POST")
+		cleanr = re.compile('<.*?>')
+		cleantext = re.sub(cleanr, '', request.POST['content'])
+		if request.POST.get('content',False) and cleantext != "":
+			print("Entre al if")
+			post = Post.objects.get(pk=1)
+			author = UserProfile.objects.get(user=request.user)
+			n_comment = Comment.objects.create(
+				post=post,
+				description=request.POST["content"],
+				author=author,
+				status=0,
+			)
+			n_comment.save()
+			print("Comment creado")
+			n_file = CommentArchive.objects.create(
+				comment=n_comment,
+				document=request.FILES['saved_file'] if request.FILES.get('saved_file',False) else None,
+			)
+			n_file.save()
+			print("File creado")
+			data = {
+				'message':"ok"
+			}
+			return JsonResponse(data)
+		else:
+			print("Entre al else")
+			data = {'message' : 'fail'}
+			return JsonResponse(data)
+	else:
+		return HttpResponseRedirect(reverse('index'))
