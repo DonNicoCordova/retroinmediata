@@ -292,12 +292,19 @@ def comment_post(request):
 	else:
 		return HttpResponseRedirect(reverse('index'))
 
-@login_required(login_url='/auth/login/')
-def delete_post(request, post_id):
-    data = {}
-    template_name = 'section_details.html'
-    data['post'] = Post.objects.all()
-    comment = Comment.objects.filter(post = post_id).delete()
-    Post.objects.get(pk=post_id).delete()
-    return HttpResponseRedirect(reverse('section_details'))
-#ESTA FUNCION NO SABÍA COMO FILTRAR LOS COMENTARIOS DEL POST QUE SE ESTA BORRANDO, NECESITO PROBARLO PARA SABER SI FUNCIONA
+@csrf_exempt
+def delete_post(request):
+	data = {}
+	data['post'] = Post.objects.all()
+	post_id = request.POST["pk"]
+	comment = Comment.objects.filter(post = post_id).delete()
+	Post.objects.get(pk=post_id).delete()
+	return JsonResponse({'message':'ok'})
+
+@csrf_exempt
+def delete_comment(request):
+	data = {}
+	print("POST ",request.POST)
+	comment_id = request.POST["pk"]
+	comment = Comment.objects.get(pk = comment_id).delete()
+	return JsonResponse({'message':'ok'})

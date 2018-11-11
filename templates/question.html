@@ -243,8 +243,8 @@
                                                                     </small>
                                                                 </div>
                                                                 <div class="col-md-offset-3 col-md-3 col-lg-3 ">
-                                                                    <button class="btn btn-sm btn-warning pull-right">Editar</button>
-                                                                    <button class="btn btn-sm btn-danger pull-right">Eliminar</button>
+                                                                    <a class="btn btn-sm btn-warning pull-right">Editar</a>
+                                                                    <a class="btn btn-sm btn-danger pull-right eliminar" data-pk="{{x.pk}}" >Eliminar</a>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -362,9 +362,31 @@
                 });
                 return false;
             }
-                
             $(function() {
                 $('form').submit(upload);
+                
+            });
+            $(".eliminar").click(function(){
+                console.log("click")
+                var pk = $(this).data("pk");
+                data = {
+                    csrfmiddlewaretoken: "{{csrf_token}}",
+                    pk: pk,
+                }
+                console.log(data);
+                $.ajax({
+                    url:'{% url "delete_comment" %}',
+                    type: "POST",
+                    data: data,
+                    cache: false,
+                    processData: false,
+                    contentType: false,
+                    success: function(data) {
+                        if (data.message == "ok"){
+                            location.reload();
+                        }
+                    }
+                });
             });
         });
     </script>
