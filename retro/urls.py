@@ -8,4 +8,5 @@ urlpatterns = [
 	path('question/', views.question, name="question"),
     path('forum/', views.forum, name="forum"),
     path('comment_post/', views.comment_post, name="comment_post"),
+    path('delete_post/<int:id>/', views.delete_post, name="delete_post"),
 ]
