@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 from django.shortcuts import render
+from django.http import JsonResponse
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from retro.models import CommentRanking, ThreadRanking
 from django.db.models import Q
 from retro_auth.models import UserProfile
 from retro.forms import post_form, post_form_document
@@ -24,7 +26,7 @@ module_dict = {"D1": "08:30 - 10:10", "D2": "10:20 - 12:00",
                "V3": "20:40 - 22:20"}
 
 
-#@login_required(login_url='/auth/login/')
+@login_required(login_url='/auth/login/')
 def index(request):
     # data = {}
     # profile = UserProfile.objects.get(user=request.user,user_type=request.Sections['type'])
@@ -146,3 +148,110 @@ def post(request):
 
     template_name = 'Post.html'
     return render(request, template_name, data)
+
+def question(request):
+        template_name = 'question.html'
+
+        #For Testing
+        user = UserProfile.objects.get(rut="111111111")
+        questionPk = 1
+
+        comments = Comment.objects.filter(post=questionPk)
+
+        listComments = []
+        for i in comments:
+            rankingSum = 0
+            rankingAvg = 0.0
+            numRatings = 0
+            rankings = CommentRanking.objects.filter(comment=i)
+
+            for j in rankings:
+                rankingSum += j.rating
+                numRatings += 1
+
+            if (numRatings != 0):
+                rankingAvg = rankingSum / numRatings
+
+            listComments.append(tuple((i,rankingAvg)))
+
+        if request.POST:
+            if CommentRanking.objects.filter(userprofile=user.id,comment=request.POST["comment"]).exists():
+                crank = CommentRanking.objects.get(userprofile=user.id,comment=request.POST["comment"])
+                crank.rating = request.POST["rating"]
+            else:
+                comment = Comment.objects.get(pk=request.POST["comment"])
+                crank = CommentRanking(userprofile=user,comment=comment,rating=request.POST["rating"])
+
+            crank.save()
+            comments = Comment.objects.filter(post=questionPk)
+            dictRatings = {}
+
+            for i in comments:
+                rankingSum = 0
+                rankingAvg = 0.0
+                numRatings = 0
+                rankings = CommentRanking.objects.filter(comment=i)
+
+                for j in rankings:
+                    rankingSum += j.rating
+                    numRatings += 1
+                if (numRatings != 0):
+                    rankingAvg = rankingSum / numRatings
+                    dictRatings[i.pk] = rankingAvg
+            #print (request.POST["rating"])
+            return JsonResponse(dictRatings)
+        return render(request, template_name, {"Comments":listComments})
+
+def forum(request):
+        template_name = 'forum.html'
+
+        #For Testing
+        user = UserProfile.objects.get(rut="111111111")
+        sectionPk = 1
+        questionPk = 1
+        allThreads = Thread.objects.filter(section=sectionPk)
+        section = Section.objects.get(pk=allThreads[0].section.id)
+        sectionNRC = section.nrc
+
+        listThreads = []
+        for i in allThreads:
+            rankingSum = 0
+            rankingAvg = 0.0
+            numRatings = 0
+            rankings = ThreadRanking.objects.filter(thread=i)
+
+            for j in rankings:
+                rankingSum += j.rating
+                numRatings += 1
+
+            if (numRatings != 0):
+                rankingAvg = rankingSum / numRatings
+
+            listThreads.append(tuple((i,rankingAvg)))
+
+        if request.POST:
+            if ThreadRanking.objects.filter(userprofile=user.id,thread=request.POST["thread"]).exists():
+                trank = ThreadRanking.objects.get(userprofile=user.id,thread=request.POST["thread"])
+                trank.rating = request.POST["rating"]
+            else:
+                thread = Comment.objects.get(pk=request.POST["thread"])
+                trank = ThreadRanking(userprofile=user,thread=thread,rating=request.POST["rating"])
+            trank.save()
+            allThreads = Comment.objects.filter(post=questionPk)
+            dictRatings = {}
+
+            for i in allThreads:
+                rankingSum = 0
+                rankingAvg = 0.0
+                numRatings = 0
+                rankings = CommentRanking.objects.filter(comment=i)
+
+                for j in rankings:
+                    rankingSum += j.rating
+                    numRatings += 1
+                if (numRatings != 0):
+                    rankingAvg = rankingSum / numRatings
+                    dictRatings[i.pk] = rankingAvg
+            #print (request.POST["rating"])
+            return JsonResponse(dictRatings)
+        return render(request, template_name, {"Threads":listThreads,"SectionNRC":sectionNRC})
