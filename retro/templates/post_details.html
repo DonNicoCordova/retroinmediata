@@ -107,7 +107,7 @@
                               <input type="text" value="{{Postpk}}" name="Postpk" hidden>
                               <div class="form-group">
                                 <label>Comentar:</label>
-                                <input placeholder="Escriba su comentario"  class="form-control summernote" type="text" id="summernote" name="description">
+                                <input placeholder="Escriba su comentario"  class="form-control summernote#1" type="text" id="summernote" name="description">
                               </div>
                               <div class="fileinput fileinput-new input-group" data-provides="fileinput">
                                   <div class="form-control" data-trigger="fileinput">
@@ -117,7 +117,7 @@
                                   <span class="input-group-addon btn btn-default btn-file">
                                       <span class="fileinput-new">Adjuntar Archivo</span>
                                       <span class="fileinput-exists">Cambiar</span>
-                                      <input type="file" id="saved_file" name="saved_file"/>
+                                      <input type="file" id="id_document" name="document"/>
                                   </span>
                                   <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
                               </div>
@@ -218,13 +218,13 @@
           toolbar: false,
           height: 100,
       });
-      $(function() {
-        $('form').submit(upload);
-      });
+      {#$(function() {#}
+      {#  $('form').submit(upload);#}
+      {#});#}
       $(".eliminar").click(function(){
           var pk = $(this).data("pk");
           let data = {
-              csrfmiddlewaretoken: "{{csrf_token}}",
+              csrfmiddlewaretoken: getCookie('csrftoken'),
               pk: pk,
           };
           $.ajax({

@@ -144,17 +144,26 @@ def post_details(request, pk):
     if Post.objects.filter(pk=pk).exists():
         post = Post.objects.get(pk=pk)
         all_comment = Comment.objects.filter(post=post)
-        lista_coment = []
+        listComments = []
         for i in all_comment:
-            try:
-                file = CommentArchive.objects.get(comment=i)
-                lista_coment.append([i, file])
-            except CommentArchive.DoesNotExist:
-                lista_coment.append([i, ""])
-        data['Comments'] = lista_coment
+            rankingSum = 0
+            rankingAvg = 0.0
+            numRatings = 0
+            rankings = CommentRanking.objects.filter(comment=i)
+
+            for j in rankings:
+                rankingSum += j.rating
+                numRatings += 1
+
+            if (numRatings != 0):
+                rankingAvg = rankingSum / numRatings
+
+            listComments.append(tuple((i, rankingAvg)))
+        data['Comments'] = listComments
         data['post'] = post
         if request.method == "POST":
             data['form'] = post_form(request.POST)
+            print(request.POST)
             if data['form'].is_valid():
                 new_comment = Comment(post=post, description=request.POST['description'],
                                       author=request.user.userprofile)
