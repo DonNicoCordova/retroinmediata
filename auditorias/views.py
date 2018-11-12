@@ -4,6 +4,19 @@ from retro.models import *
 
 # Create your views here.
 
+#def auditorias(request):
+#    # mydate = datetime.datetime.now()
+#    return render(request, "auditorias/auditorias.html", {"umbral":UserProfile.objects.all(), "date":Post.objects.all(), "now": datetime.datetime.now()})
+def porcentaje(lista1,keywords_2):
+    print(len(lista1),len(keywords_2))
+    porcentaje1 = 100*len(lista1)/len(keywords_2) #66.6%
+    print(porcentaje1)
+
+    if porcentaje1 > 65:
+        print("Similar")
+    else:
+        print("No similares")
+
 def auditorias(request):
     lista = []
     unico = []

@@ -3,5 +3,7 @@ from . import views
 
 
 urlpatterns = [
-    path('', views.auditorias, name="auditorias"),
+    # path('', views.index, name="index"),
+    path('',views.auditorias, name="auditorias"),
+    #path('repetido/',views.repetido, name="repetido"),
 ]
