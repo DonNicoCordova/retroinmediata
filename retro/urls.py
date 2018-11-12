@@ -4,6 +4,8 @@ from retro import views
 urlpatterns = [
     path('', views.index, name="index"),
     path('Seccion/<int:pk>/', views.section_details, name="section_details"),
+    path('Hilo/<int:pk>/', views.thread_details, name="thread_details"),
+    path('Pregunta/<int:pk>/', views.post_details, name="post_details"),
     path('Post', views.post, name="post"),
 	path('question/', views.question, name="question"),
     path('forum/', views.forum, name="forum"),
