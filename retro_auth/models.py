@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class UserProfile(models.Model):
-    user = models.OneToOneField(User,null=True,default=None,on_delete=models.CASCADE)
+    user = models.ForeignKey(User,null=True,default=None,on_delete=models.CASCADE)
     rut = models.CharField(max_length=12, default="Sin Rut")
     
     def __str__(self):

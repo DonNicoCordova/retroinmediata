@@ -2,7 +2,7 @@
 from django.db import models
 from django.utils import timezone
 from retro_auth.models import UserProfile
-from retro.models import Post
+from retro.models import*
 
 # Create your models here.
 
@@ -27,8 +27,17 @@ class AnswerReportUser(models.Model):
         return "Reporte: %s con fecha %s studiante %s %s al profesor %s %s" % (self.report.description, self.report.publish_date, self.student.user.first_name, self.student.user.last_name, self.teacher.user.first_name, self.teacher.user.last_name)
 
 
-class Alerta(models.Model):
-    post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    student = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='student_report_question')
-    student = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='student_report_answer')
-    status = models.BooleanField(default=True)
+#Creado 11-11
+#tabla de notificaciones 
+class notification(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE) #post que fue comentado
+    user_ask = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='student_report_question') #usuario que realizo la pregunta
+    user_ans = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='student_report_answer') #usuario que realizo la respuesta
+    status = models.BooleanField(default=True) #deberia ser cambiado cuando apretemos encima  True pára mostrar y False para no mostrar
+    #hilo = funcion(retorna si es hilo True, si no False )
+
+
+    def __str__(self):
+    #Arreglamos esta funcion para que aparezca el nombre y el rut del usuario BIEN
+        return 'El usuario %s respondio a %s (que hizo la pregunta)' % (self.user_ans.user,self.user_ask.user )
+

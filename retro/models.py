@@ -2,7 +2,6 @@
 from django.db import models
 from retro_auth.models import UserProfile
 from django.utils import timezone
-from datetime import datetime
 from retro.defines import *
 from django.core.validators import MaxValueValidator, MinValueValidator
 
@@ -80,13 +79,9 @@ class Thread(models.Model):
     publish_date = models.DateTimeField(default=timezone.now)
     status = models.BooleanField(default=True)
 
-    def getDiference(self):
-        now = datetime.now(timezone.utc)
-        difference = now - self.publish_date
-        return int(difference.total_seconds() / 3600)
-
     def __str__(self):
-        return "Pregunta '%s' a la seccion %s" % (self.name, self.section.nrc)
+        #Se Cambio descripcion
+        return "Hilo '%s' a la seccion %s" % (self.name, self.section.nrc)
 
 
 class ThreadRanking(models.Model):
@@ -99,7 +94,6 @@ class ThreadRanking(models.Model):
 
     def __str__(self):
         return "El usuario '%s %s' evaluó el hilo %s con %s" % (self.userprofile.user.first_name, self.userprofile.user.last_name, self.thread.name, self.rating)
-
 
 class ThreadFollower(models.Model):
     thread = models.ForeignKey('Thread', on_delete=models.CASCADE)
@@ -121,13 +115,9 @@ class Post(models.Model):
     last_mod = models.DateTimeField(default=timezone.now)
     status = models.BooleanField(default=True)
 
-    def getDiference(self):
-        now = datetime.now(timezone.utc)
-        difference = now - self.publish_date
-        return int(difference.total_seconds() / 3600)
-
     def __str__(self):
-        return 'El usuario %s %s en el hilo %s preguntó %s' % (self.author.user.first_name, self.author.user.last_name, self.thread.name, self.description)
+        #Arreglamos esta funcion para que aparezca el nombre y el rut del usuario BIEN
+        return 'El usuario %s %s en el hilo %s preguntó %s' % (self.author.user, self.author.rut, self.thread.name, self.description)
 
 
 class PostFollower(models.Model):
