@@ -361,13 +361,12 @@ def comment_post(request):
 
 @csrf_exempt
 def delete_post(request):
-    if request.POST:
-        data = {}
-        data['post'] = Post.objects.all()
-        post_id = request.POST["pk"]
-        comment = Comment.objects.filter(post=post_id).delete()
-        Post.objects.get(pk=post_id).delete()
-        return JsonResponse({'message': 'ok'})
+    data = {}
+    data['post'] = Post.objects.all()
+    post_id = request.POST["pk"]
+    comment = Comment.objects.filter(post=post_id).delete()
+    Post.objects.get(pk=post_id).delete()
+    return JsonResponse({'message': 'ok'})
 
 
 @csrf_exempt

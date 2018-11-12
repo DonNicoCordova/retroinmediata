@@ -93,6 +93,10 @@
                             <i class="fa fa-css3"> </i>
                         </div>
                     </div>
+                    <div class="col-md-offset-9 col-md-3 col-lg-3 ">
+                      <a class="btn btn-sm btn-warning pull-right">Editar</a>
+                      <a class="btn btn-sm btn-danger pull-right eliminar" data-pk="{{x.pk}}" >Eliminar</a>
+                    </div>  
                 </div>
             </div>
           {% endfor %}
@@ -165,7 +169,39 @@
 {% block javascript %}
 
 <script>
+    function getCookie(name){
+      var cookieValue = null;
+      if (document.cookie && document.cookie != ''){
+          var cookies = document.cookie.split(';');
+          for(var i = 0; i < cookies.length; i++){
+              var cookie = jQuery.trim(cookies[i]);
+
+              if(cookie.substring(0,name.length + 1) == (name + '=')){
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue
+    }
     $(document).ready(function(){
+      $(".eliminar").click(function(){
+        var pk = $(this).data("pk");
+        let data = {
+            csrfmiddlewaretoken: getCookie('csrftoken'),
+            pk: pk,
+        };
+        $.ajax({
+          url:'{% url "delete_post" %}',
+          type: "POST",
+          data: data,
+          success: function(data) {
+              if (data.message == "ok"){
+                  location.reload();
+              }
+            }
+        });
+      });
     });
 </script>
 
