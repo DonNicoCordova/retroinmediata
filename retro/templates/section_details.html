@@ -144,7 +144,7 @@
                     <input type="text" name="search" id="id_search" class="form-control" placeholder="Buscar..." value="{{searchFilter|cut:'&search='}}">
                   </div>
                   <div class="col-md-2">
-                    <button type="submit" class="btn btn-success btn-block" data-toggle="modal" data-target="#addThread"><i class="fa fa-search"></i> Buscar</button>
+                    <button type="submit" class="btn btn-success btn-block"><i class="fa fa-search"></i> Buscar</button>
                   </div>
                   <div class="col-md-2">
                     <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#addThread"><i class="fa fa-plus"></i> Crear Hilo</button>
@@ -166,7 +166,7 @@
                                       <i class="fa fa-chevron-down"> </i>
                                   </a>
                               </div>
-                              <a href="#" class="vote-title">
+                              <a href="{% url 'thread_details' x.pk %}" class="vote-title">
                                   {{ x.name }}
                               </a>
                               <div class="vote-info">

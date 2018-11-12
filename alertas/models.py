@@ -2,6 +2,7 @@
 from django.db import models
 from django.utils import timezone
 from retro_auth.models import UserProfile
+from retro.models import Post
 
 # Create your models here.
 
@@ -24,3 +25,10 @@ class AnswerReportUser(models.Model):
 
     def __str__(self):
         return "Reporte: %s con fecha %s studiante %s %s al profesor %s %s" % (self.report.description, self.report.publish_date, self.student.user.first_name, self.student.user.last_name, self.teacher.user.first_name, self.teacher.user.last_name)
+
+
+class Alerta(models.Model):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    student = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='student_report_question')
+    student = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='student_report_answer')
+    status = models.BooleanField(default=True)

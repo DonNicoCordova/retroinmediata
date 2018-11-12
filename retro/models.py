@@ -121,6 +121,11 @@ class Post(models.Model):
     last_mod = models.DateTimeField(default=timezone.now)
     status = models.BooleanField(default=True)
 
+    def getDiference(self):
+        now = datetime.now(timezone.utc)
+        difference = now - self.publish_date
+        return int(difference.total_seconds() / 3600)
+
     def __str__(self):
         return 'El usuario %s %s en el hilo %s preguntó %s' % (self.author.user.first_name, self.author.user.last_name, self.thread.name, self.description)
 
