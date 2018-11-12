@@ -42,19 +42,55 @@
 
                     </ul>
                 </li>
+
+<!-- Notificacion la campanita -->
+
                 <li class="dropdown" id="notifications">
                     <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
-                        <i class="fa fa-bell"></i>  <span class="label label-primary" ></span>
+                        <i class="fa fa-bell"></i>  <span class="label label-primary" >{{cantidad}}</span>
                     </a>
+
+                    <!-- Aqui va la informacion de la notificacion -->
                     <ul class="dropdown-menu dropdown-alerts">
+                        <!-- Aqui va la informacion EN LOS li-->  
+                     {% for x in notificaciones %}
                         <li>
                             <a href="#">
                                 <div>
                                     <i class="fa fa-envelope fa-fw"></i>
+                                    <span class="text-muted ">{{x.post}}</span>
                                     <span class="pull-right text-muted small">4 minutes ago</span>
                                 </div>
+
                             </a>
                         </li>
+                        {% endfor %}  
+                        <li class="divider"></li>
+                        <a id="borrar"><strong class="center-text">Borrar Notificaciones</strong></a>
+                    </ul>
+                </li>
+
+                <li class="dropdown" id="notifications">
+                    <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                        <i class="fa fa-bell"></i>  <span class="label label-primary" >{{cantidad2}}</span>
+                    </a>
+
+                    <!-- Aqui va la informacion de la notificacion -->
+                    <!-- REFRESCAR SOLO NOTIFICACION CON UN PING TRATAR DE IMPLEMENTAR-->
+                    <ul class="dropdown-menu dropdown-alerts">
+                        <!-- Aqui va la informacion EN LOS li-->  
+                     {% for x in lista_hilo %}
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-envelope fa-fw"></i>
+                                    <span class="text-muted ">{{x.thread}} se respondio algo </span>
+                                    <span class="pull-right text-muted small">4 minutes ago</span>
+                                </div>
+
+                            </a>
+                        </li>
+                        {% endfor %}  
                         <li class="divider"></li>
                         <a id="borrar"><strong class="center-text">Borrar Notificaciones</strong></a>
                     </ul>
