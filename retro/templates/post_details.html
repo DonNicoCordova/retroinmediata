@@ -7,6 +7,10 @@
 <link href="{% static 'css/plugins/chosen/bootstrap-chosen.css' %}" rel="stylesheet">
 <link href="{% static 'css/ios.css' %}" rel="stylesheet">
 <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+<link href="{% static 'css/ios.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/jasny/jasny-bootstrap.min.css' %}" rel="stylesheet">
+<link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
+
 <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
   <style type="text/css">
     .jqstooltip {
@@ -102,12 +106,12 @@
                           {% endfor %}
                       </div>
                       <div class="col-lg-12 col-sm-12" style="padding-top:2%">
-                          <form id="formComment" method="POST" action="{% url 'post_details' post.pk %}" enctype="multipart/form-data">
+                          <form id="formComment" method="POST" action="{% url 'comment_post' %}" enctype="multipart/form-data">
                               {% csrf_token %}
-                              <input type="text" value="{{Postpk}}" name="Postpk" hidden>
+                              <input type="text" value="{{post.pk}}" name="Postpk" hidden>
                               <div class="form-group">
                                 <label>Comentar:</label>
-                                <input placeholder="Escriba su comentario"  class="form-control summernote#1" type="text" id="summernote" name="description">
+                                <input placeholder="Escriba su comentario"  class="form-control summernote" type="text" id="summernote" name="description">
                               </div>
                               <div class="fileinput fileinput-new input-group" data-provides="fileinput">
                                   <div class="form-control" data-trigger="fileinput">
@@ -133,6 +137,8 @@
   </div>
 {% endblock content %}
 {% block javascript %}
+    <script src="{% static 'js/plugins/jasny/jasny-bootstrap.min.js' %}"></script>
+    
   <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js"></script>
   <script>
     function getCookie(name){
@@ -218,9 +224,10 @@
           toolbar: false,
           height: 100,
       });
-      {#$(function() {#}
-      {#  $('form').submit(upload);#}
-      {#});#}
+
+      $(function() {
+        $('form').submit(upload);
+      });
       $(".eliminar").click(function(){
           var pk = $(this).data("pk");
           let data = {
