@@ -46,7 +46,7 @@
           <button type="button" class="btn btn-w-m btn-primary" id="info_tab"><i class="fa fa-info"></i> Información</button>
           <button type="button" class="btn btn-w-m btn-info" id="comment_tab"><i class="fa fa-comments"></i> Hilos</button>
       </div>
-      <div id="information" {% if searchFilter != '' %} style="display: none"{% endif %}>
+      <div id="information" {% if searchFilter|cut:'&search=' == "" %}style="display: none"{% endif %}>
           <div class="col-md-12 col-xs-12 col-lg-12 " style="padding-top:2%">
               <div class="panel panel-primary">
                   <div class="panel-heading">
@@ -133,7 +133,7 @@
               </div>
           </div>
       </div>
-      <div id="commentaries" {% if searchFilter == '' %} style="display: none"{% endif %}>
+      <div id="commentaries" {% if searchFilter|cut:'&search=' != "" %}style="display: none"{% endif %}>
         <div class="col-lg-12 animated fadeInRight">
           <div class="wrapper wrapper-content">
           {% if request|PrivilegeCreateThread:section.pk %}

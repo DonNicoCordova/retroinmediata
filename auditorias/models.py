@@ -4,6 +4,7 @@ from django.utils import timezone
 from retro_auth.models import UserProfile
 from alertas.models import AnswerReport
 
+
 # Create your models here.
 
 class ForoAudit(models.Model):

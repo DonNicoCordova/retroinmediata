@@ -14,7 +14,7 @@ import os
 import requests
 
 def auth_login(request):
-    # logout(request)
+    logout(request)
     username = password = ''
     # if request.POST:
     #     request.session["h"] = 0
@@ -315,7 +315,7 @@ def auth_login(request):
     #         messages.error(request, 'Usuario y contraseña invalidos. Intentelo nuevamente.')
     # data = {}
     template_name = "login.html"
-    return render(request, template_name, {})
+    return render(request, template_name, data)
 
 
 def auth_logout(request):
