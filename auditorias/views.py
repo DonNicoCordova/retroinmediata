@@ -34,6 +34,10 @@ def auditorias(request):
     for i in lista:
         lista2.append(i.split(" "))
 
+        
+    #volver la lista repetidos a cero
+    #agregar el else cuando es una sola palabra
+    #mandar las weas a porcentaje antes de volver la lista a cero
     for palubria in lista2:
         print(len(palubria))
         for v in key3:
