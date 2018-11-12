@@ -163,7 +163,6 @@ def post_details(request, pk):
         data['post'] = post
         if request.method == "POST":
             data['form'] = post_form(request.POST)
-            print(request.POST)
             if data['form'].is_valid():
                 new_comment = Comment(post=post, description=request.POST['description'],
                                       author=request.user.userprofile)
@@ -332,12 +331,10 @@ def forum(request):
 @csrf_exempt
 def comment_post(request):
     if request.method == "POST":
-        print("Entre al POST")
         cleanr = re.compile('<.*?>')
         cleantext = re.sub(cleanr, '', request.POST['content'])
         if request.POST.get('content', False) and cleantext != "":
-            print("Entre al if")
-            post = Post.objects.get(pk=1)
+            post = Post.objects.get(pk=request.POST['Postpk'])
             author = UserProfile.objects.get(user=request.user)
             n_comment = Comment.objects.create(
                 post=post,
@@ -346,19 +343,16 @@ def comment_post(request):
                 status=0,
             )
             n_comment.save()
-            print("Comment creado")
             n_file = CommentArchive.objects.create(
                 comment=n_comment,
-                document=request.FILES['saved_file'] if request.FILES.get('saved_file', False) else None,
+                document=request.FILES['document'] if request.FILES.get('document', False) else None,
             )
             n_file.save()
-            print("File creado")
             data = {
                 'message': "ok"
             }
             return JsonResponse(data)
         else:
-            print("Entre al else")
             data = {'message': 'fail'}
             return JsonResponse(data)
     else:
@@ -379,7 +373,6 @@ def delete_post(request):
 @csrf_exempt
 def delete_comment(request):
     data = {}
-    print("POST ", request.POST)
     comment_id = request.POST["pk"]
     comment = Comment.objects.get(pk=comment_id).delete()
     return JsonResponse({'message': 'ok'})
