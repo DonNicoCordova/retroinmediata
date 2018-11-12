@@ -32,7 +32,7 @@ def index(request):
 		sections = Section.objects.filter(Q(students=profile))
 	else:
 		sections = Section.objects.filter(Q(teacher=profile))
-		 
+
 	data['sections'] = []
 	for section in sections:
 		if section.schedule != "Sin Horario":
@@ -45,7 +45,7 @@ def index(request):
 				time = module_dict[time]
 				classroom = schedule.split(";")[1]
 				output.append([day,time,classroom])
-				
+
 			data['sections'].append([section,output])
 		else:
 			data['sections'].append([section,section.schedule])
@@ -57,7 +57,7 @@ def index(request):
 def section_details(request,pk):
 	template_name = 'section_details.html'
 	data = {}
-	
+
 	if Section.objects.filter(pk=pk).exists():
 		section = Section.objects.get(pk=pk)
 		if section.schedule != "Sin Horario":
@@ -70,7 +70,7 @@ def section_details(request,pk):
 				time = module_dict[time]
 				classroom = schedule.split(";")[1]
 				output.append([day,time,classroom])
-				
+
 			data['section'] = [section,output]
 		else:
 			data['section'] = [section,section.schedule]
@@ -79,7 +79,7 @@ def section_details(request,pk):
 		messages.error(request, 'No existe la sección.')
 		return HttpResponseRedirect(reverse('index'))
 
-		
+
 	return render(request, template_name, data)
 
 def question(request):
@@ -167,17 +167,17 @@ def forum(request):
                 trank = ThreadRanking.objects.get(userprofile=user.id,thread=request.POST["thread"])
                 trank.rating = request.POST["rating"]
             else:
-                thread = Comment.objects.get(pk=request.POST["thread"])
+                thread = Thread.objects.get(pk=request.POST["thread"])
                 trank = ThreadRanking(userprofile=user,thread=thread,rating=request.POST["rating"])
             trank.save()
-            allThreads = Comment.objects.filter(post=questionPk)
+            allThreads = Thread.objects.filter(section=sectionPk)
             dictRatings = {}
 
             for i in allThreads:
                 rankingSum = 0
                 rankingAvg = 0.0
                 numRatings = 0
-                rankings = CommentRanking.objects.filter(comment=i)
+                rankings = ThreadRanking.objects.filter(thread=i)
 
                 for j in rankings:
                     rankingSum += j.rating
