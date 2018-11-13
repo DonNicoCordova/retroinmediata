@@ -375,3 +375,15 @@ def delete_comment(request):
     comment_id = request.POST["pk"]
     comment = Comment.objects.get(pk=comment_id).delete()
     return JsonResponse({'message': 'ok'})
+
+@csrf_exempt
+def frequent_questions_student(request):
+	data={}
+	template_name = "frequent_questions_student.html"
+	return render(request, template_name,data)
+
+@csrf_exempt
+def frequent_questions_teacher(request):
+	data={}
+	template_name = "frequent_questions_teacher.html"
+	return render(request, template_name,data)
