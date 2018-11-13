@@ -11,22 +11,29 @@ import datetime
 #    return render(request, "auditorias/auditorias.html", {"umbral":UserProfile.objects.all(), "date":Post.objects.all(), "now": datetime.datetime.now()})
 
 def auditorias(request):
+    data = {}
     lista = []
     lista2= []
-    vacio = []
     aux=[]
     repetido = []
-
+    
+    #se traen los post y se pasan a mayuscula para poder comparar
     for x in Post.objects.all():
         lista.append(x.title.upper())
-
+    
+    # keywords_2 sera el post recibido
     keywords_2 = "buena los cabros".upper()
 
     key3 = keywords_2.split(" ")
 
+    # agrega las preguntas a una lista
     for i in lista:
         lista2.append(i.split(" "))
-
+        
+    #compara las palabras del nuevo post con las preguntas de todos los post 
+    # en vase a un porcentaje mayor a 65% de coincidencia
+    # agregar filtro de preguntas de un hilo
+    
     for palubria in lista2:
         repetido = []
         aux=[]
@@ -44,10 +51,9 @@ def auditorias(request):
         print(porcentaje1)
 
         if porcentaje1 > 65:
+            # data para html para mostrar alerta de coincidencia
+            data['mensaje'] = 'similar'
             print("Similar a",palubria)
-        else:
-            print("No similares")
-
         
     return render(request, "auditorias/auditorias.html",{"umbral":UserProfile.objects.all(),"date":Post.objects.all()})
 
