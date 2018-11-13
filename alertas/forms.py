@@ -8,4 +8,12 @@ class AlertaForm(ModelForm):
     
     class Meta:
         model = AnswerReportUser
-        fields = ['report','student','teacher']
+        fields = ['teacher']
+
+class Alerta2Form(ModelForm):
+    
+    class Meta:
+        model = AnswerReport
+        fields = ['description']
+        widgets = {'description': forms.Textarea(attrs={'class': 'form-control',
+                                                        'placeholder': 'Ingresa la descripción'}),}

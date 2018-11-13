@@ -11,6 +11,7 @@ class ForoAudit(models.Model):
     director = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='director_audit_foro')
     student = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='student_audit_foro')
     teacher = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='teacher_audit_foro')
+    #section
     alert = models.OneToOneField(AnswerReport, on_delete=models.CASCADE)
     publish_date = models.DateTimeField(default=timezone.now)
 
