@@ -104,9 +104,25 @@
                 </li>
 
             </ul>
-
         </nav>
         </div>
+
+
+        {%for a in Seguir %}
+        	
+        	<form>
+        	<span id="holaaa">{{a}}</span>
+        	{% csrf_token %}
+        	{{hilo}}
+        	 <input type = "button" value =  "{{hilo}}" onclick="Prueba()" id = "boton-seguir" >
+        	 </form>
+        {% endfor %}
+		
+
+       
+
+
+
 
         {% block breadcrumb %}{% endblock breadcrumb %}
             <div class="wrapper wrapper-content">
@@ -168,7 +184,64 @@
 
     {% block javascript %}
 
+        <script type="text/javascript">
+        	function Prueba(){
+        		var x = document.getElementById("boton-seguir").value;
+
+        		if (x == "No Seguir"){
+        			document.getElementById("boton-seguir").value = "Seguir";
+        			document.getElementById("holaaa").innerHTML = "ya no lo sigue"
+        		}
+
+        		if (x == "Seguir"){
+        			document.getElementById("boton-seguir").value = "No Seguir";
+        			document.getElementById("holaaa").innerHTML = "ahora lo sigue"
+        		}
+
+        	}
+        	function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+
+			$("#boton-seguir").on('click', function() {
+				var x = document.getElementById("boton-seguir").value;
+				$.ajax({
+					url: '{% url "NOTIFICATION" %}',
+					type: 'POST',
+        data: {
+          'status': x,
+          'csrfmiddlewaretoken': getCookie('csrftoken')
+        },
+        dataType: 'json',
+        success: function (data) {
+          if (data.is_taken) {
+            alert("A user with this username already exists.");
+          }
+        }
+      });
+
+    });
+
+
+
+        </script>
+
     {% endblock javascript %}
+
+
 
 </body>
 </html>

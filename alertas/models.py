@@ -41,3 +41,5 @@ class notification(models.Model):
     #Arreglamos esta funcion para que aparezca el nombre y el rut del usuario BIEN
         return 'El usuario %s respondio a %s (que hizo la pregunta)' % (self.user_ans.user,self.user_ask.user )
 
+class seguimiento(models.Model):
+    pass

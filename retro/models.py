@@ -98,12 +98,17 @@ class ThreadRanking(models.Model):
 class ThreadFollower(models.Model):
     thread = models.ForeignKey('Thread', on_delete=models.CASCADE)
     userprofile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
 
     class Meta:
         unique_together = (('thread', 'userprofile'),)
 
     def __str__(self):
-        return "El usuario '%s %s' sigue el hilo %s" % (self.userprofile.user.first_name, self.userprofile.user.last_name, self.thread.name)
+        if self.status:
+            return "El usuario '%s %s' sigue el hilo %s" % (self.userprofile.user, self.userprofile.user.last_name, self.thread.name)
+        else:
+            return "El usuario '%s %s'NO sigue el hilo %s" % (self.userprofile.user, self.userprofile.user.last_name, self.thread.name)
+
 
 
 class Post(models.Model):
@@ -114,6 +119,7 @@ class Post(models.Model):
     publish_date = models.DateTimeField(default=timezone.now)
     last_mod = models.DateTimeField(default=timezone.now)
     status = models.BooleanField(default=True)
+    seguir = models.BooleanField(default=True)
 
     def __str__(self):
         #Arreglamos esta funcion para que aparezca el nombre y el rut del usuario BIEN
@@ -123,12 +129,13 @@ class Post(models.Model):
 class PostFollower(models.Model):
     post = models.ForeignKey('Post', on_delete=models.CASCADE)
     userprofile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    status = models.BooleanField(default=True)
 
     class Meta:
         unique_together = (('post', 'userprofile'),)
 
     def __str__(self):
-        return "El usuario '%s %s' sigue el la pregunta %s" % (self.userprofile.user.first_name, self.userprofile.user.last_name, self.post.description)
+        return "El usuario '%s %s' sigue el la pregunta %s" % (self.userprofile.user, self.userprofile.user.last_name, self.post.description)
 
 
 class PostRanking(models.Model):
@@ -140,7 +147,7 @@ class PostRanking(models.Model):
         unique_together = (('userprofile', 'post'),)
 
     def __str__(self):
-        return "El usuario '%s %s' evaluó la pregunta %s con %s" % (self.userprofile.user.first_name, self.userprofile.user.last_name, self.post.description, self.rating)
+        return "El usuario '%s %s' evaluó la pregunta %s con %s" % (self.userprofile.user, self.userprofile.user.last_name, self.post.description, self.rating)
 
 
 class Comment(models.Model):
