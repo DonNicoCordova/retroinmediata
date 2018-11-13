@@ -383,29 +383,29 @@ def delete_comment(request):
     return JsonResponse({'message': 'ok'})
 
 
-def edit_post(request):
-    template_name = 'pregunta.html'
-    data = {}
-    # post = Post.objects.get(pk=18, author=request.user.userprofile)
-    # data['form'] = edit_postForm(instance=post)
-    # if request.POST:
-    #     data['form'] = edit_postForm(request.POST, instance=post)
-    #     if data['form'].is_valid():
-    #         data['form'] = data['form'].save(commit=False)
-    #         data['form'].last_mod = datetime.now()
-    #         data['form'].save()
-    #         return HttpResponseRedirect(reverse('edit_post'))
-    data['form'] = create_postForm()
-    if request.POST:
-        data['form'] = create_postForm(request.POST)
-        print(request.POST)
-        if data['form'].is_valid():
-            # Post.objects.create(title=request.POST['title'], description=request.POST['description'])
-            # a = Post(title=request.POST['title'], description=request.POST['description')}
-            # a.save()
-            data['form'] = data['form'].save(commit=False)
-            data['form'].thread_id = 1
-            data['form'].author = request.user.userprofile
-            data['form'].save()
-            return HttpResponseRedirect(reverse('edit_post'))
-    return render(request, template_name, data)
+# def edit_post(request):
+#     template_name = 'pregunta.html'
+#     data = {}
+#     # post = Post.objects.get(pk=18, author=request.user.userprofile)
+#     # data['form'] = edit_postForm(instance=post)
+#     # if request.POST:
+#     #     data['form'] = edit_postForm(request.POST, instance=post)
+#     #     if data['form'].is_valid():
+#     #         data['form'] = data['form'].save(commit=False)
+#     #         data['form'].last_mod = datetime.now()
+#     #         data['form'].save()
+#     #         return HttpResponseRedirect(reverse('edit_post'))
+#     data['form'] = create_postForm()
+#     if request.POST:
+#         data['form'] = create_postForm(request.POST)
+#         print(request.POST)
+#         if data['form'].is_valid():
+#             # Post.objects.create(title=request.POST['title'], description=request.POST['description'])
+#             # a = Post(title=request.POST['title'], description=request.POST['description')}
+#             # a.save()
+#             data['form'] = data['form'].save(commit=False)
+#             data['form'].thread_id = 1
+#             data['form'].author = request.user.userprofile
+#             data['form'].save()
+#             return HttpResponseRedirect(reverse('edit_post'))
+#     return render(request, template_name, data)
