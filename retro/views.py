@@ -9,11 +9,12 @@ from django.contrib import messages
 from retro.models import CommentRanking, ThreadRanking
 from django.db.models import Q
 from retro_auth.models import UserProfile
-from retro.forms import post_form, post_form_document
+from retro.forms import post_form, post_form_document, edit_postForm, create_postForm
 from .models import Section, Thread, Comment, CommentArchive, Post
 from .forms import ThreadForms, PostForms
 import re
 from django.views.decorators.csrf import csrf_exempt
+from datetime import datetime
 
 # Create your views here.
 
@@ -210,7 +211,6 @@ def post(request):
             new_comment.save()
             create_comment_archives(new_comment, request.FILES['document'])
             return HttpResponseRedirect(reverse('post'))
-
     else:
         data['form'] = post_form()
         data['form_arch'] = post_form_document()
@@ -381,3 +381,31 @@ def delete_comment(request):
     comment_id = request.POST["pk"]
     comment = Comment.objects.get(pk=comment_id).delete()
     return JsonResponse({'message': 'ok'})
+
+
+def edit_post(request):
+    template_name = 'pregunta.html'
+    data = {}
+    # post = Post.objects.get(pk=18, author=request.user.userprofile)
+    # data['form'] = edit_postForm(instance=post)
+    # if request.POST:
+    #     data['form'] = edit_postForm(request.POST, instance=post)
+    #     if data['form'].is_valid():
+    #         data['form'] = data['form'].save(commit=False)
+    #         data['form'].last_mod = datetime.now()
+    #         data['form'].save()
+    #         return HttpResponseRedirect(reverse('edit_post'))
+    data['form'] = create_postForm()
+    if request.POST:
+        data['form'] = create_postForm(request.POST)
+        print(request.POST)
+        if data['form'].is_valid():
+            # Post.objects.create(title=request.POST['title'], description=request.POST['description'])
+            # a = Post(title=request.POST['title'], description=request.POST['description')}
+            # a.save()
+            data['form'] = data['form'].save(commit=False)
+            data['form'].thread_id = 1
+            data['form'].author = request.user.userprofile
+            data['form'].save()
+            return HttpResponseRedirect(reverse('edit_post'))
+    return render(request, template_name, data)

@@ -27,3 +27,21 @@ class post_form_document(forms.ModelForm):
     class Meta:
         model = CommentArchive
         fields = ['document']
+
+
+class edit_postForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        widgets = {'title': forms.TextInput(attrs={'class': 'form-control',
+                                                   'placeholder': 'Ingresa el título'}),
+                   'description': forms.Textarea(attrs={'class': 'form-control',
+                                                        'placeholder': 'Ingresa la descripción'}),
+                   'last_mod': forms.DateTimeInput(attrs={'class': 'form-control',
+                                                          'placeholder': 'Ingresa la fecha'})}
+        fields = ['title', 'description', 'last_mod']
+
+
+class create_postForm(forms.ModelForm):
+    class Meta:
+        model = Post
+        fields = ['title', 'description']
