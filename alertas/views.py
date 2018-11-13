@@ -24,7 +24,7 @@ def alerta(request):
             aux2.student = request.user.userprofile
             aux2.save()
 
-            return redirect('alertas')
+            return HttpResponseRedirect(reverse('alerta'))
 
     else:
         data['form'] = AlertaForm()
