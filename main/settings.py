@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'retro',
     'minutas',
     'alertas',
-    'auditorias'
+    'auditorias',
 ]
 
 MIDDLEWARE = [
