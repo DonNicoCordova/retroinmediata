@@ -8,6 +8,7 @@ from retro_auth.models import UserProfile
 from django.contrib import messages
 from retro.models import *
 from django.db.models import Q
+from operator import itemgetter
 import requests
 import json
 import os
@@ -163,28 +164,50 @@ def forum(request):
             listThreads.append(tuple((i,rankingAvg)))
 
         if request.POST:
-            if ThreadRanking.objects.filter(userprofile=user.id,thread=request.POST["thread"]).exists():
-                trank = ThreadRanking.objects.get(userprofile=user.id,thread=request.POST["thread"])
-                trank.rating = request.POST["rating"]
-            else:
-                thread = Thread.objects.get(pk=request.POST["thread"])
-                trank = ThreadRanking(userprofile=user,thread=thread,rating=request.POST["rating"])
-            trank.save()
-            allThreads = Thread.objects.filter(section=sectionPk)
-            dictRatings = {}
+            if request.POST['rtype']=='sort':
+                sortedList = []
+                if request.POST['order']=='Ascending':
+                    print ("SORTING ASC")
+                    sortedList = sorted(listThreads,key=lambda t: t[1])
+                    print ("Ascending: ",sortedList)
+                elif request.POST['order']=='Descending':
+                    print ("SORTING DES")
+                    sortedList = sorted(listThreads,reverse=True, key=lambda t: t[1])
+                    print ("Descending: ",sortedList)
+                dictThreadsSorted = {}
 
-            for i in allThreads:
-                rankingSum = 0
-                rankingAvg = 0.0
-                numRatings = 0
-                rankings = ThreadRanking.objects.filter(thread=i)
+                for index,items in enumerate(sortedList, start=1):
+                    dictThreadsSorted[index] = {}
+                    dictThreadsSorted[index]["pk"] = items[0].pk
+                    dictThreadsSorted[index]["name"] = items[0].name
+                    dictThreadsSorted[index]["publish_date"] = items[0].publish_date
+                    dictThreadsSorted[index]["rating"] = items[1]
+                return JsonResponse(dictThreadsSorted)
 
-                for j in rankings:
-                    rankingSum += j.rating
-                    numRatings += 1
-                if (numRatings != 0):
-                    rankingAvg = rankingSum / numRatings
-                    dictRatings[i.pk] = rankingAvg
-            #print (request.POST["rating"])
-            return JsonResponse(dictRatings)
+            if request.POST['rtype']=='rate':
+                if ThreadRanking.objects.filter(userprofile=user.id,thread=request.POST["thread"]).exists():
+                    trank = ThreadRanking.objects.get(userprofile=user.id,thread=request.POST["thread"])
+                    trank.rating = request.POST["rating"]
+                else:
+                    thread = Thread.objects.get(pk=request.POST["thread"])
+                    trank = ThreadRanking(userprofile=user,thread=thread,rating=request.POST["rating"])
+                trank.save()
+                allThreads = Thread.objects.filter(section=sectionPk)
+                dictRatings = {}
+
+                for i in allThreads:
+                    rankingSum = 0
+                    rankingAvg = 0.0
+                    numRatings = 0
+                    rankings = ThreadRanking.objects.filter(thread=i)
+
+                    for j in rankings:
+                        rankingSum += j.rating
+                        numRatings += 1
+                    if (numRatings != 0):
+                        rankingAvg = rankingSum / numRatings
+                        dictRatings[i.pk] = rankingAvg
+                #print ("Ascending: ",sorted(listThreads,key=lambda t: t[1]))
+                #print ("Descending: ",sorted(listThreads,reverse=True, key=lambda t: t[1]))
+                return JsonResponse(dictRatings)
         return render(request, template_name, {"Threads":listThreads,"SectionNRC":sectionNRC})

@@ -200,13 +200,13 @@
                                 <div class="ibox float-e-margins">
                                     <div class="ibox-title" style="width: 100%;height: 40px;">
                                       <h5 style="padding-left: 20px;">Sección {{ SectionNRC }} - Hilos de Discusión</h5>
+                                      <button id="orderbtn" type="button" class="btn btn-xs pull-right" value="None" onclick="orderAnswers()">Ordenar por Calificación</button>
                                         <br>
                                     </div>
                                     <div class="ibox-content">
-                                        <div>
                                             <div id="feedAnswers" class="feed-activity-list">
                                                 {% for x,y in Threads %}
-                                                <div class="feed-element" align="left">
+                                                <div id="Answer_{{x.pk}}" class="feed-element" align="left">
                                                   <small class="pull-left">{{x.publish_date}}</small>
                                                     <div class="media-body ">
                                                         <h3 style="padding-left: 20px;">{{x.name}}</h3>
@@ -221,10 +221,7 @@
                                                     </small>
                                                 </div>
                                                 {% endfor %}
-
                                             </div>
-                                        </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -287,6 +284,60 @@
         });
     </script>
 
+    <script>
+    	function orderAnswers() {
+    	   var btn = document.getElementById("orderbtn");
+         var sortOrder = ""
+         if (btn.value == "None") {
+           btn.value = "Ascending"
+           btn.innerText = "Menor a mayor calificado ▲"
+           btn.classList.add("btn-primary");
+           sortOrder = "Ascending"
+         }else if (btn.value == "Ascending") {
+           btn.value = "Descending"
+           btn.innerText = "Mayor a menor calificado ▼"
+           sortOrder = "Descending"
+         }else if (btn.value == "Descending") {
+           btn.value = "Ascending"
+           btn.innerText = "Menor a mayor calificado ▲"
+           sortOrder = "Ascending"
+         }
+         $.ajax({
+           url : "{% url 'forum' %}",
+           type : "POST",
+           data : {
+             rtype : 'sort',
+             order : sortOrder,
+             csrfmiddlewaretoken : getCookie('csrftoken'),
+           },
+           success : function(data){
+             var answerFeed = document.getElementById("feedAnswers");
+             for (x in data){
+              var answer = document.getElementById("Answer_"+x);
+              if(answer != null){
+                answerFeed.removeChild(answer);
+              }
+            answerFeed.innerHTML+=
+            '<div id="Answer_'+data[x]['pk']+'" class="feed-element" align="left">'+
+              '<small class="pull-left">'+data[x]['publish_date']+'</small>'+
+                '<div class="media-body ">'+
+                    '<h3 style="padding-left: 20px;">'+data[x]['name']+'</h3>'+
+                '</div>'+
+                '<button id="ratingNumber_'+x+'" class="ratingNumber"'+'onclick="rateAnswer(this.id,&#39ratingStars_'+x+'&#39)"style="display: inline;"><b id="ratingNumberTxt_'+x+'" style="font-size: 18px; color: gold;">☆ '+data[x]['rating']+'</b></button>'+
+                '<small id="ratingStars_'+x+'" class="rating" style="display: none; font-size: 150%;">'+
+                  '<span id="rating5_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                  '<span id="rating4_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                  '<span id="rating3_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                  '<span id="rating2_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                  '<span id="rating1_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                '</small>'+
+            '</div>';
+            }
+           },
+         });
+    	}
+  	</script>
+
 	<script>
   	function rateAnswer(idRatingNumber,idRatingStar) {
   	   var x = document.getElementById(idRatingNumber);
@@ -326,13 +377,13 @@
       var y = document.getElementById(idRatingStar);
   	  var z = document.getElementById(idRatingNumberTxt);
       if (x.style.display === "none") {
-          //window.alert(comment.description)
           var ratingUser = idStar.replace("rating", "").split("_")[0];
 
           $.ajax({
             url : "{% url 'forum' %}",
             type : "POST",
             data : {
+              rtype : 'rate',
               rating : ratingUser,
               thread : threadPk,
               csrfmiddlewaretoken : getCookie('csrftoken'),
@@ -343,7 +394,6 @@
               y.style.display = "none";
             },
           });
-
       } else {
           x.style.display = "none";
   		    y.style.display = "inline";
