@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block stylesheet %}
+
+<link href="{% static 'css/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/chosen/bootstrap-chosen.css' %}" rel="stylesheet">
+<link href="{% static 'css/ios.css' %}" rel="stylesheet">
+<link href="{% static 'css/styles.css' %}" rel="stylesheet">
+
+{% endblock stylesheet %}
+
+
+{% block breadcrumb %}
+<div class="row wrapper border-bottom white-bg page-heading" style="padding-bottom: 0px;">
+    <div class="col-lg-10">
+        <h2>Crear Minuta</h2>
+    </div>
+    <div class="col-lg-2">
+
+    </div>
+</div>
+{% endblock breadcrumb %}
+{% block content %}
+
+<form action="" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Tematica *</label>
+            <div class="input-group">
+                {{form.them}}
+            </div>
+            {{form.them.errors}}
+        </div>
+        <div class="form-group">
+            <label>Descripcion *</label>
+            <div class="input-group">
+                {{form.desc}}
+            </div>
+            {{form.desc.errors}}
+            <!--<ul class="errorlist">
+                <li>El email no es correcto.</li>
+            </ul>-->
+        </div>
+        <div class="form-group">
+            <label>Direccion *</label>
+            <div class="input-group">
+                {{form.addr}}
+            </div>
+            {{form.addr.errors}}
+        </div>
+        <div class="text-center">
+            <input type="submit" class="btn btn-primary btn-block py-2" value="Enviar">
+        </div>
+    </form> 
+
+
+{% endblock content %}
+
+
+{% block javascript %}
+<script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+<script>
+    
+</script>
+
+
+{% endblock javascript %}

@@ -17,18 +17,18 @@ def auditorias(request):
 
 
 def historial_auditorias(request):
-
     template_name = "auditorias/_auditorias.html"
     data = {}
     data['auditoria'] = ForoAudit.objects.all()
-    data['secciones'] = Section.objects.all()
      
-
     return render(request, template_name, data)
     
 def buscar_auditorias(request):
+    template_name = "auditorias/_auditorias2.html"
+    data = {}
+    data['auditorias'] = ForoAudit.objects.all()
     
-    return render(request, "auditorias/audi2.html", {"auditorias":ForoAudit.objects.all()})
+    return render(request, template_name, data)
 
 """
 #def auditorias(request):
