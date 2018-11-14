@@ -145,6 +145,8 @@ def post_details(request, pk):
         post = Post.objects.get(pk=pk)
         all_comment = Comment.objects.filter(post=post)
         listComments = []
+
+
         for i in all_comment:
             rankingSum = 0
             rankingAvg = 0.0
@@ -158,7 +160,11 @@ def post_details(request, pk):
             if (numRatings != 0):
                 rankingAvg = rankingSum / numRatings
 
-            listComments.append(tuple((i, rankingAvg)))
+            try:
+                file = CommentArchive.objects.get(comment=i)
+                listComments.append(tuple((i, rankingAvg, file)))
+            except:
+                listComments.append(tuple((i, rankingAvg, "")))
         data['Comments'] = listComments
         data['post'] = post
         if request.method == "POST":
@@ -374,4 +380,10 @@ def delete_comment(request):
     data = {}
     comment_id = request.POST["pk"]
     comment = Comment.objects.get(pk=comment_id).delete()
+    return JsonResponse({'message': 'ok'})
+
+def delete_imag(request):
+    data = {}
+    print("holi")
+    archive = CommentArchive.objects.get(pk=request.POST["pk"]).delete()
     return JsonResponse({'message': 'ok'})
