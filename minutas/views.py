@@ -9,15 +9,19 @@ def minutas(request):
     pass
 
 def crear_minuta(request):
-    if request.method == 'POST':
-        form = MinutasForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            return redirect(reverse('crear_minuta')+"?ok")
-    else:
-        form = MinutasForm()
-    return render(request, "minutas/_minutas.html", {'form':form})
+    permisos = UserProfile.objects.get(user=request.user)
+    if permisos.usertype_set.all()[0].dcareer or permisos.usertype_set.all()[0].sacademic:
 
+        if request.method == 'POST':
+            form = MinutasForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save()
+                return redirect(reverse('crear_minuta')+"?ok")
+        else:
+            form = MinutasForm()
+        return render(request, "minutas/_minutas.html", {'form':form})
+    else:
+        return redirect('minutas')
 """   
 def crear_minuta(request):
     minutas_form = MinutasForm()
