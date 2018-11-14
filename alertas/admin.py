@@ -4,3 +4,4 @@ from .models import AnswerReport, AnswerReportUser
 
 admin.site.register(AnswerReport)
 admin.site.register(AnswerReportUser)
+admin.site.register(notification)
