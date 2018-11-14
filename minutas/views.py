@@ -9,8 +9,8 @@ def minutas(request):
     pass
 
 def crear_minuta(request):
-    permisos = UserProfile.objects.get(user=request.user)
-    if permisos.usertype_set.all()[0].dcareer or permisos.usertype_set.all()[0].sacademic:
+    privilegio = UserProfile.objects.get(user=request.user)
+    if privilegio.is_dcareer or privilegio.is_sacademic:
 
         if request.method == 'POST':
             form = MinutasForm(request.POST, request.FILES)
