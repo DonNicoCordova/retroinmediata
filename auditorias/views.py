@@ -4,13 +4,7 @@ from retro.models import *
 import datetime
 
 
-# Create your views here.
-
-#def auditorias(request):
-#    # mydate = datetime.datetime.now()
-#    return render(request, "auditorias/auditorias.html", {"umbral":UserProfile.objects.all(), "date":Post.objects.all(), "now": datetime.datetime.now()})
-
-def auditorias(request):
+def coincidencia(request):
     data = {}
     lista = []
     lista2= []
@@ -57,4 +51,15 @@ def auditorias(request):
         
     return render(request, "auditorias/auditorias.html",{"umbral":UserProfile.objects.all(),"date":Post.objects.all()})
 
-#   "parametros_rep":repetido})
+def auditorias(request):
+    pass
+#    # solo no funciona cuando no a comentado nadie o solo el profe
+#    docentes = UserProfile.objects.filter(is_teacher=True)
+#
+#    for docente in docentes:
+#        no_contestadas = []
+#        secciones = docente.section_set.all()
+#        for post in Post.objects.filter(threadsectionteacher=docente):
+#            pass if post.comment_set.filter(author=docente).exists() else no_contestadas.append(post)
+#
+#    return render(request, "auditorias/audi2.html", data)
