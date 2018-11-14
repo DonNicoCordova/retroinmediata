@@ -3,7 +3,6 @@ from retro_auth.models  import *
 from retro.models import *
 import datetime
 
-
 def coincidencia(request):
     data = {}
     lista = []
@@ -63,3 +62,18 @@ def auditorias(request):
 #            pass if post.comment_set.filter(author=docente).exists() else no_contestadas.append(post)
 #
 #    return render(request, "auditorias/audi2.html", data)
+
+
+def historial_auditorias(request):
+    template_name = "auditorias/_auditorias.html"
+    data = {}
+    data['auditoria'] = ForoAudit.objects.all()
+     
+    return render(request, template_name, data)
+    
+def buscar_auditorias(request):
+    template_name = "auditorias/_auditorias2.html"
+    data = {}
+    data['auditorias'] = ForoAudit.objects.all()
+    
+    return render(request, template_name, data)

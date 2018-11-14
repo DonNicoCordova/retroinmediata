@@ -3,6 +3,7 @@ from django.db import models
 from django.utils import timezone
 from retro_auth.models import UserProfile
 from alertas.models import AnswerReport
+from retro.models import Section
 
 
 # Create your models here.
@@ -11,7 +12,7 @@ class ForoAudit(models.Model):
     director = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='director_audit_foro')
     student = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='student_audit_foro')
     teacher = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='teacher_audit_foro')
-    #section
+    seccion = models.ForeignKey(Section, on_delete=models.CASCADE, null=True)
     alert = models.OneToOneField(AnswerReport, on_delete=models.CASCADE)
     publish_date = models.DateTimeField(default=timezone.now)
 
