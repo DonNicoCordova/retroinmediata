@@ -1,4 +1,3 @@
-
 {% load static %}
 <!DOCTYPE html>
 <html>
@@ -152,61 +151,6 @@
     {% block javascript %}
 
     {% endblock javascript %}
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
-    <!--
-    {%for x in umbral %}
-    <h1>Nombre:{{x.user}} Rut: {{x.rut}} Umbral:{{x.umbral}}</h1>
-    {% endfor %}
-    -->
-    <!--
-    {%for z in date %}
-    <h1>Titulo Pregunta:{{z.title}}</h1>
-    <h1>Pregunta:{{z.description}}</h1>
-    <h1>Fecha:{{z.publish_date}}</h1>
-    {% endfor %}
-    -->
-    <!--
-    {% for z in date %}
-    <div>
-        <h1>Titulo Pregunta:{{z.title}}</h1>
-    </div>
-    <div>
-        <h1>Pregunta:{{z.description}}</h1>
-    </div>
-        <div><h1>Fecha:{{z.publish_date}}</h1>
-    </div>
-    <br>
-    {% endfor %}
-    -->
-    <!--
-    {% for x in parametros_rep %}
-    <h5>{{x}}</h5>
-    {% endfor %}
-    -->
-    <!--
-    {% for z in date %}
-        {% if parametros > 0 %}
-            <h1>La pregunta,{{parametros_rep}}, ya existe</h1>
-        {% endif %}
-    {% endfor %}
-    -->
-    {% for z in date %}
-        {% for y in parametros_rep %}
-            {% if z.title == y %}
-                <h1>La pregunta,{{y}}, ya existe</h1>
-            {% endif %}
-        {% endfor %}
-    {% endfor %}
-
 
 </body>
 </html>
