@@ -1,8 +1,4 @@
 *.pyc
 .env
 media
-<<<<<<< HEAD
 db.sqlite3
-=======
-db.sqlite3
->>>>>>> Scrum-4
