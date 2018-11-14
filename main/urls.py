@@ -26,6 +26,7 @@ urlpatterns = [
     path('Minutas/', include('minutas.urls'), name='minutas'),
     path('Alertas/', include('alertas.urls'), name='alertas'),
     path('Auditorias/', include('auditorias.urls'), name='auditorias'),
+    #path de auditorias
 
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
