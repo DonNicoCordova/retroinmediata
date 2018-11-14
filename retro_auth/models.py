@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 class UserProfile(models.Model):
     user = models.OneToOneField(User,null=True,default=None,on_delete=models.CASCADE)
     rut = models.CharField(max_length=12, default="Sin Rut")
+    umbral = models.PositiveIntegerField(default=1)
     
     def __str__(self):
-        return "%s %s Rut: %s" % (self.user.first_name, self.user.last_name, self.rut)
+        return "%s Rut: %s Umbral: %s" % (self.user, self.rut, self.umbral)

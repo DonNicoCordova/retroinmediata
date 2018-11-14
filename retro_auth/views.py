@@ -16,6 +16,7 @@ import requests
 def auth_login(request):
     # logout(request)
     username = password = ''
+
     # if request.POST:
     #     request.session["h"] = 0
     #     username = request.POST["username"]
