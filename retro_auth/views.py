@@ -315,7 +315,6 @@ def auth_login(request):
     #     else:
     #         messages.error(request, 'Usuario y contraseña invalidos. Intentelo nuevamente.')
     # data = {}
-
     template_name = "login.html"
     return render(request, template_name, {})
 
