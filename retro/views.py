@@ -407,3 +407,13 @@ def delete_imag(request):
     print("holi")
     archive = CommentArchive.objects.get(pk=request.POST["pk"]).delete()
     return JsonResponse({'message': 'ok'})
+
+def update_comment(request):
+    data = {}
+    comment_id = request.POST["pk"]
+    comment = Comment.objects.get(pk=comment_id)
+    comment.description = request.POST["comment"]
+    comment.save()
+    data["text"] = comment.description
+    data["message"] = "ok"
+    return JsonResponse(data)

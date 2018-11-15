@@ -314,7 +314,8 @@
             var pk = $(this).data("pk");
             let data = {
                 csrfmiddlewaretoken: getCookie('csrftoken'),
-                pk: pk,
+				pk: pk,
+				comment:$('#summernote'+pk).summernote('code'),
             };
             $.ajax({
                 url: '{% url "update_comment" %}',
@@ -338,6 +339,7 @@
 			$("#description"+pk).hide();
 			$("#editar"+pk).hide();
 			$("#aceptar"+pk).show();
+			
         });
     });
 </script>
