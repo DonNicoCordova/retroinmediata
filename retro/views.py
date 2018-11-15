@@ -9,7 +9,7 @@ from django.contrib import messages
 from retro.models import CommentRanking, ThreadRanking
 from django.db.models import Q
 from retro_auth.models import UserProfile
-from retro.forms import post_form, post_form_document
+from retro.forms import Post_form, Post_form_document
 from .models import Section, Thread, Comment, CommentArchive, Post
 from .forms import ThreadForms, PostForms
 import re
@@ -178,8 +178,8 @@ def post_details(request, pk):
                 return HttpResponseRedirect(reverse('post_details', kwargs={'pk': pk}))
             print(data['form'].errors)
         else:
-            data['form'] = post_form()
-            data['form_arch'] = post_form_document()
+            data['form'] = Post_form()
+            data['form_arch'] = Post_form_document()
     else:
         messages.error(request, 'No existe la pregunta.')
         return HttpResponseRedirect(reverse('index'))
