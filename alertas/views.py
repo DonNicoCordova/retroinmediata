@@ -19,7 +19,7 @@ def NOTIFICATION(request):
 	TEMPLATE_NAME = "base.html" #Template  en la cual enviaremos los datos al final de la funcion
 
 	connected_user = UserProfile.objects.get(user = request.user) #Traemos la lista de usuario que hay en la BDD
-	notificaciones = notification.objects.filter(user_ask = connected_user) #Traemos las notificaciones correspondientes al usuario conectado
+	notificaciones = Alerta.objects.filter(student_question = connected_user) #Traemos las notificaciones correspondientes al usuario conectado
 	notificaciones_hilo =  ThreadFollower.objects.filter(userprofile = connected_user) #Traemos los hilos correspondientes al usuario conectado
 	follow_post = PostFollower.objects.filter(userprofile = connected_user) #Traemos los post a los cuales se sigue correspondientes al usuario conectado
 	estado = True
@@ -64,7 +64,7 @@ def viewNotifications(request):
 	pks = request.POST.getlist('info[]', False)
 
 	for pk in pks:
-		notifications = notification.objects.get(pk = int(pk))
+		notifications = Alerta.objects.get(pk = int(pk))
 		notifications.status = False
 		
 		notifications.save()
