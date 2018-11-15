@@ -248,34 +248,51 @@ def question(request):
         if (numRatings != 0):
             rankingAvg = rankingSum / numRatings
 
-        listComments.append(tuple((i, rankingAvg)))
+        listComments.append(tuple((i, round(rankingAvg, 1))))
 
     if request.POST:
-        if CommentRanking.objects.filter(userprofile=user.id, comment=request.POST["comment"]).exists():
-            crank = CommentRanking.objects.get(userprofile=user.id, comment=request.POST["comment"])
-            crank.rating = request.POST["rating"]
-        else:
-            comment = Comment.objects.get(pk=request.POST["comment"])
-            crank = CommentRanking(userprofile=user, comment=comment, rating=request.POST["rating"])
+        if request.POST['rtype']=='sort':
+            sortedList = []
+            if request.POST['order']=='Ascending':
+                sortedList = sorted(listComments,key=lambda t: t[1])
+            elif request.POST['order']=='Descending':
+                sortedList = sorted(listComments,reverse=True, key=lambda t: t[1])
+            dictAnswersSorted = {}
 
-        crank.save()
-        comments = Comment.objects.filter(post=questionPk)
-        dictRatings = {}
+            for index,items in enumerate(sortedList, start=1):
+                dictAnswersSorted[index] = {}
+                dictAnswersSorted[index]["pk"] = items[0].pk
+                dictAnswersSorted[index]["description"] = items[0].description
+                dictAnswersSorted[index]["author"] = '%s %s' % (items[0].author.user.first_name, items[0].author.user.last_name)
+                dictAnswersSorted[index]["publish_date"] = items[0].publish_date
+                dictAnswersSorted[index]["rating"] = items[1]
+                print(dictAnswersSorted[index])
+            return JsonResponse(dictAnswersSorted)
 
-        for i in comments:
-            rankingSum = 0
-            rankingAvg = 0.0
-            numRatings = 0
-            rankings = CommentRanking.objects.filter(comment=i)
+        if request.POST['rtype']=='rate':
+            if CommentRanking.objects.filter(userprofile=user.id, comment=request.POST["comment"]).exists():
+                crank = CommentRanking.objects.get(userprofile=user.id, comment=request.POST["comment"])
+                crank.rating = request.POST["rating"]
+            else:
+                comment = Comment.objects.get(pk=request.POST["comment"])
+                crank = CommentRanking(userprofile=user, comment=comment, rating=request.POST["rating"])
+            crank.save()
+            comments = Comment.objects.filter(post=questionPk)
+            dictRatings = {}
 
-            for j in rankings:
-                rankingSum += j.rating
-                numRatings += 1
-            if (numRatings != 0):
-                rankingAvg = rankingSum / numRatings
-                dictRatings[i.pk] = rankingAvg
-        # print (request.POST["rating"])
-        return JsonResponse(dictRatings)
+            for i in comments:
+                rankingSum = 0
+                rankingAvg = 0.0
+                numRatings = 0
+                rankings = CommentRanking.objects.filter(comment=i)
+
+                for j in rankings:
+                    rankingSum += j.rating
+                    numRatings += 1
+                if (numRatings != 0):
+                    rankingAvg = rankingSum / numRatings
+                    dictRatings[i.pk] = round(rankingAvg, 1)
+            return JsonResponse(dictRatings)
     return render(request, template_name, {"Comments": listComments, 'Postpk': questionPk})
 
 
@@ -283,7 +300,7 @@ def forum(request):
         template_name = 'forum.html'
 
         #For Testing
-        user = UserProfile.objects.get(rut="111111111")
+        user = request.user.userprofile
         sectionPk = 1
 
         allThreads = Thread.objects.filter(section=sectionPk)
@@ -304,19 +321,15 @@ def forum(request):
             if (numRatings != 0):
                 rankingAvg = rankingSum / numRatings
 
-            listThreads.append(tuple((i,rankingAvg)))
+            listThreads.append(tuple((i,round(rankingAvg, 1))))
 
         if request.POST:
             if request.POST['rtype']=='sort':
                 sortedList = []
                 if request.POST['order']=='Ascending':
-                    print ("SORTING ASC")
                     sortedList = sorted(listThreads,key=lambda t: t[1])
-                    print ("Ascending: ",sortedList)
                 elif request.POST['order']=='Descending':
-                    print ("SORTING DES")
                     sortedList = sorted(listThreads,reverse=True, key=lambda t: t[1])
-                    print ("Descending: ",sortedList)
                 dictThreadsSorted = {}
 
                 for index,items in enumerate(sortedList, start=1):
@@ -325,6 +338,7 @@ def forum(request):
                     dictThreadsSorted[index]["name"] = items[0].name
                     dictThreadsSorted[index]["publish_date"] = items[0].publish_date
                     dictThreadsSorted[index]["rating"] = items[1]
+                    print(dictThreadsSorted[index])
                 return JsonResponse(dictThreadsSorted)
 
             if request.POST['rtype']=='rate':
@@ -349,7 +363,7 @@ def forum(request):
                         numRatings += 1
                     if (numRatings != 0):
                         rankingAvg = rankingSum / numRatings
-                        dictRatings[i.pk] = rankingAvg
+                        dictRatings[i.pk] = round(rankingAvg, 1)
                 return JsonResponse(dictRatings)
         return render(request, template_name, {"Threads":listThreads,"SectionNRC":sectionNRC})
 
