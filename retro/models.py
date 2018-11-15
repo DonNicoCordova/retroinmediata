@@ -15,18 +15,6 @@ class Threshold(models.Model):
     def __str__(self):
         return "%s %s con umbral de: %s" % (self.teacher.user.first_name, self.teacher.user.last_name, self.time)
 
-
-class UserType(models.Model):
-    userprofile = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
-    teacher = models.BooleanField()
-    student = models.BooleanField()
-    sacademic = models.BooleanField()
-    dcareer = models.BooleanField()
-
-    def __str__(self):
-        return "%s %s es: Profesor: %s, Estudiante: %s, S.Académico: %s, D.Carrera: %s" % (self.userprofile.user.first_name, self.userprofile.user.last_name, self.teacher, self.student, self.sacademic, self.dcareer)
-
-
 class Career(models.Model):
     director = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=200, default="Sin Carrera")
