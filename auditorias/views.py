@@ -52,17 +52,19 @@ def coincidencia(request):
     return render(request, "auditorias/auditorias.html",{"umbral":UserProfile.objects.all(),"date":Post.objects.all()})
 
 def auditorias(request):
-    pass
 #    # solo no funciona cuando no a comentado nadie o solo el profe
 #    docentes = UserProfile.objects.filter(is_teacher=True)
-#
+#    print(docentes)
 #    for docente in docentes:
 #        no_contestadas = []
 #        secciones = docente.section_set.all()
 #        for post in Post.objects.filter(threadsectionteacher=docente):
-#            pass if post.comment_set.filter(author=docente).exists() else no_contestadas.append(post)
-#
-#    return render(request, "auditorias/audi2.html", data)
+#            if post.comment_set.filter(author=docente).exists():
+#                pass
+#            else:
+#                no_contestadas.append(post)
+
+    return render(request, "auditorias/audi2.html", data)
 
 
 def historial_auditorias(request):
