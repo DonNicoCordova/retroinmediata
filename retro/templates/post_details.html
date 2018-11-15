@@ -91,7 +91,7 @@
                                     <div class="media-body ">
                                         <small class="pull-right" style=""> <b>{{x.author.user.first_name}}
                                                 {{x.author.user.last_name}}</b></small><br>
-                                        <div class="well">{{x.description|safe}}</div>
+                                        <div class="well" id="description{{x.pk}}">{{x.description|safe}}</div>
                                         <div id="edit_field{{x.pk}}" style="display:none">
                                             <div placeholder="Escriba su comentario" class="form-control summernote" type="text"
                                                 id="summernote" name="description">{{x.description|safe}}</div>
@@ -133,8 +133,8 @@
                                         </div>
                                         {% if x.author == request.user.userprofile %}
                                         <div class="col-md-offset-3 col-md-3 col-lg-3 ">
-                                            <a class="btn btn-sm btn-warning pull-right" data-pk="{{x.pk}}">Editar</a>
-                                            <a class="btn btn-sm btn-success pull-right" style="display:none" data-pk="{{x.pk}}">Aceptar</a>
+                                            <a class="btn btn-sm btn-warning pull-right editar" id="editar{{x.pk}}" data-pk="{{x.pk}}">Editar</a>
+                                            <a class="btn btn-sm btn-info pull-right aceptar" id="aceptar{{x.pk}}" style="display:none" data-pk="{{x.pk}}">Aceptar</a>
                                             <a class="btn btn-sm btn-danger pull-right eliminar" data-pk="{{x.pk}}">Eliminar</a>
                                         </div>
                                         {% endif %}
@@ -292,6 +292,7 @@
         $(function () {
             $('form').submit(upload);
         });
+
         $(".eliminar").click(function () {
             var pk = $(this).data("pk");
             let data = {
@@ -308,6 +309,35 @@
                     }
                 }
             });
+        });
+        $(".aceptar").click(function () {
+            var pk = $(this).data("pk");
+            let data = {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                pk: pk,
+            };
+            $.ajax({
+                url: '{% url "update_comment" %}',
+                type: "POST",
+                data: data,
+                success: function (data) {
+                    if (data.message == "ok") {
+						$("#description"+pk).html(data.text);
+						$("#edit_field"+pk).hide();
+						$("#description"+pk).show();
+						$("#editar"+pk).show();
+						$("#aceptar"+pk).hide();
+						location.reload();
+                    }
+                }
+            });
+        });
+        $(".editar").click(function () {
+            var pk = $(this).data("pk");
+            $("#edit_field"+pk).show();
+			$("#description"+pk).hide();
+			$("#editar"+pk).hide();
+			$("#aceptar"+pk).show();
         });
     });
 </script>
