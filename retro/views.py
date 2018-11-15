@@ -407,3 +407,14 @@ def delete_imag(request):
     print("holi")
     archive = CommentArchive.objects.get(pk=request.POST["pk"]).delete()
     return JsonResponse({'message': 'ok'})
+@csrf_exempt
+def frequent_questions_student(request):
+	data={}
+	template_name = "frequent_questions_student.html"
+	return render(request, template_name,data)
+
+@csrf_exempt
+def frequent_questions_teacher(request):
+	data={}
+	template_name = "frequent_questions_teacher.html"
+	return render(request, template_name,data)

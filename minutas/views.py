@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from .forms import MinutasForm, RefuseMinutes
 from minutas.models import *
-from retro.views import *
-
+from retro_auth.models import *
+from django.http import JsonResponse
 # Create your views here.
 
 def minutas(request):
@@ -44,4 +45,5 @@ def crear_minuta(request):
             return redirect(reverse('crear_minuta')+"?ok")
     else:
         form = MinutasForm()
+
     return render(request, "minutas/_minutas.html", {'form':form})
