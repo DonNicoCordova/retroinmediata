@@ -201,18 +201,18 @@
                                     <div class="ibox-title" style="width: 100%;height: 100px;">
                                         <small class="pull-left">Ayer 5:20 pm - 12.06.2018</small>
                                         <br>
-
                                         <div class="ibox-tools">
                                             <span class="label label-warning-light pull-left">{{Comments|length}} Respuestas</span><h5 style="padding-left: 20px;">Pregunta: ¿Qué contenidos entran en la solemne Nº2?</h5><a href="profile.html" class="pull-right">
-                                                        <img alt="image" class="img-circle" src="{% static 'img/a5.jpg' %}" style="width: 38px;height: 38px;">
-                                                    </a><small class="pull-right"> <b>Francisca Ramirez</b></small>
-                                           </div>
+                                                  <img alt="image" class="img-circle" src="{% static 'img/a5.jpg' %}" style="width: 38px;height: 38px;">
+                                                  </a><small class="pull-right"> <b>Francisca Ramirez</b></small>
+                                        </div>
                                     </div>
+                                    <button id="orderbtn" type="button" class="btn btn-outline btn-xs btn-primary pull-right" value="None" onclick="orderAnswers()" style="margin-top: 10px;">Ordenar por Calificación</button>
                                     <div class="ibox-content">
                                         <div>
                                             <div id="feedAnswers" class="feed-activity-list">
                                                 {% for x,y in Comments %}
-                                                <div class="feed-element" align="left">
+                                                <div id="Answer_{{x.pk}}" class="feed-element" align="left">
                                                   <small class="pull-left">{{x.publish_date}}</small>
                                                     <a href="profile.html" class="pull-right">
                                                         <img alt="image" class="img-circle" src="{% static 'img/a1.jpg' %}">
@@ -297,6 +297,70 @@
         });
     </script>
 
+    <script>
+    	function orderAnswers() {
+    	   var btn = document.getElementById("orderbtn");
+         var sortOrder = ""
+         if (btn.value == "None") {
+           btn.value = "Ascending"
+           btn.innerText = "Menor a mayor calificado ▲"
+           btn.classList.add("btn-primary");
+           sortOrder = "Ascending"
+         }else if (btn.value == "Ascending") {
+           btn.value = "Descending"
+           btn.innerText = "Mayor a menor calificado ▼"
+           sortOrder = "Descending"
+         }else if (btn.value == "Descending") {
+           btn.value = "Ascending"
+           btn.innerText = "Menor a mayor calificado ▲"
+           sortOrder = "Ascending"
+         }
+         $.ajax({
+           url : "{% url 'question' %}",
+           type : "POST",
+           data : {
+             rtype : 'sort',
+             order : sortOrder,
+             csrfmiddlewaretoken : getCookie('csrftoken'),
+           },
+           success : function(data){
+             var answerFeed = document.getElementById("feedAnswers");
+             for (x in data){
+              var answer = document.getElementById("Answer_"+x);
+              if(answer != null){
+                answerFeed.removeChild(answer);
+              }
+              answerFeed.innerHTML+=
+              '<div id="Answer_'+data[x]['pk']+'" class="feed-element" align="left">'+
+                '<small class="pull-left">'+data[x]['publish_date']+'</small>'+
+                  '<a href="profile.html" class="pull-right">'+
+                      '<img id="imgprof_'+data[x]['pk']+'" alt="image" class="img-circle">'+
+                  '</a>'+
+                  '<div class="media-body ">'+
+                      '<small class="pull-right" style=""> <b>'+data[x]['author']+'</b></small><br>'  +
+                      '<div class="well">'+data[x]['description']+'</div>'+
+                  '</div>'+
+                  '<button id="ratingNumber_'+x+'" class="ratingNumber"'+'onclick="rateAnswer(this.id,&#39ratingStars_'+x+'&#39)"style="display: inline;"><b id="ratingNumberTxt_'+x+'" style="font-size: 18px; color: gold;">☆ '+data[x]['rating']+'</b></button>'+
+                  '<small id="ratingStars_'+x+'" class="rating" style="display: none; font-size: 150%;">'+
+                    '<span id="rating5_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                    '<span id="rating4_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                    '<span id="rating3_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                    '<span id="rating2_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                    '<span id="rating1_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                  '</small>'+
+              '</div>';
+              var imgProf = document.getElementById('imgprof_'+data[x]['pk']);
+              imgProf.src = "{% static 'img/a1.jpg' %}";
+              console.log('imgprof_'+data[x]['pk'])
+              console.log(imgProf)
+              console.log("{% static 'img/a1.jpg' %}")
+            }
+           },
+         });
+    	}
+  	</script>
+
+
 	<script>
   	function rateAnswer(idRatingNumber,idRatingStar) {
   	   var x = document.getElementById(idRatingNumber);
@@ -336,13 +400,12 @@
       var y = document.getElementById(idRatingStar);
   	  var z = document.getElementById(idRatingNumberTxt);
       if (x.style.display === "none") {
-          //window.alert(comment.description)
           var ratingUser = idStar.replace("rating", "").split("_")[0];
-
           $.ajax({
             url : "{% url 'question' %}",
             type : "POST",
             data : {
+              rtype : 'rate',
               rating : ratingUser,
               comment : commentPk,
               csrfmiddlewaretoken : getCookie('csrftoken'),
@@ -351,12 +414,8 @@
               z.innerHTML = '☆ ' + data[commentPk];
               x.style.display = "inline";
               y.style.display = "none";
-              //console.log(data);
-              //console.log(commentPk);
-              //console.log(data[commentPk]);
             },
           });
-
       } else {
           x.style.display = "none";
   		    y.style.display = "inline";
