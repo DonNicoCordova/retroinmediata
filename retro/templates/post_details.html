@@ -88,7 +88,7 @@
                                                     <span>
                                                         <img src="{% get_media_prefix %}{{z.document}}" onclick="this.width=500;this.height=500;" onmouseout="this.width=50;this.height=50;" width="50" height="50" alt="" />
                                                     {% if x.author.user == request.user %}
-                                                        <a id="imagen" data-pk="{{z.pk}}">Eliminar</a>
+                                                        <a class="imagen" data-pk="{{z.pk}}">Eliminar</a>
                                                     {% endif %}
                                                     </span>
                                                 </a>
@@ -244,8 +244,8 @@
           height: 100,
       });
 
-      $("#imagen").click(function () {
-          alert("aqui")
+      $(".imagen").click(function () {
+
           var pk = $(this).data("pk");
           $.ajax({
             url:'{% url "delete_imag" %}',
