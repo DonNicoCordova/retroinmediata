@@ -3,6 +3,7 @@ from django.shortcuts import redirect
 from retro_auth.models  import *
 from retro.models import *
 from auditorias.forms import edit_umbral
+from auditorias.models import *
 import datetime
 
 def coincidencia(request):
@@ -46,8 +47,11 @@ def coincidencia(request):
 
         if porcentaje1 > 65:
             # data para html para mostrar alerta de coincidencia
+            return(True)
             data['mensaje'] = 'similar'
             print("Similar a",palubria)
+        else:
+            return(False)
         
     return render(request, "auditorias/auditorias.html",{"umbral":UserProfile.objects.all(),"date":Post.objects.all()})
 
@@ -55,21 +59,23 @@ def auditorias(request):
     pass
 #    # solo no funciona cuando no a comentado nadie o solo el profe
 #    docentes = UserProfile.objects.filter(is_teacher=True)
-#
+#    print(docentes)
 #    for docente in docentes:
 #        no_contestadas = []
 #        secciones = docente.section_set.all()
 #        for post in Post.objects.filter(threadsectionteacher=docente):
-#            pass if post.comment_set.filter(author=docente).exists() else no_contestadas.append(post)
+#            if post.comment_set.filter(author=docente).exists():
+#                pass
+#            else:
+#                no_contestadas.append(post)
 #
 #    return render(request, "auditorias/audi2.html", data)
 
 
 def historial_auditorias(request):
-    template_name = "auditorias/_auditorias.html"
     data = {}
     data['auditoria'] = ForoAudit.objects.all()
-     
+    template_name = "auditorias/_auditorias.html"
     return render(request, template_name, data)
     
 def buscar_auditorias(request):
@@ -86,7 +92,7 @@ def edit_Umbral(request):
     data["now"] = datetime.datetime.now()
     umbral = UserProfile.objects.get(user=request.user)
     # teacher=UserProfile.objects.all()
-    if umbral.is_teacher:
+    if umbral.is_teacher == True:
         if request.method == 'GET':
             form = edit_umbral(instance=umbral)
         else:
