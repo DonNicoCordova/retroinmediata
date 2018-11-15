@@ -25,11 +25,8 @@ def minutas(request):
             userprofiles = UserProfile.objects.get(user = request.user)
             obj.userprofile = userprofiles
             obj.save()
-
-            return JsonResponse({'message': 'ok'})
-
+            
     else:
-        print("holi")
         template = "minutas/listar_minutas.html"
         return render(request, template, data)
     template = "minutas/listar_minutas.html"
