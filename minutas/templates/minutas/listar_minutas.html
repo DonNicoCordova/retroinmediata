@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}
+Minutas
+
+{% endblock %}
+{% block stylesheet %}
+  <style>
+    {#body {#}
+    {#  font-family: 'Roboto';font-size: 25px;#}
+    {#}#}
+    .bodyElement h2 {
+        font-size: 30px;
+    }
+    .bodyElement p {
+        font-size: 15px;
+        font-weight: 400;
+        color: #a6a7aa;
+        margin-bottom: 15px;
+    }
+    .bodyElement h1, h2, h3, h4, h5, h6 {
+        font-weight: 700;
+        color: #515769;
+        line-height: 1.4;
+        margin: 0 0 15px;
+    }
+    .bodyElement h1 > a, h2 > a, h3 > a, h4 > a, h5 > a, h6 > a {
+        color: #515769;
+    }
+    .bodyElement .margin-b-20 {
+        margin-bottom: 20px !important;
+    }
+    .bodyElement .margin-b-40 {
+        margin-bottom: 40px !important;
+    }
+    .bodyElement .margin-b-50 {
+        margin-bottom: 40px !important;
+    }
+     .bodyElement a:hover {
+        color: #999caa;
+        text-decoration: none;
+    }
+    .bodyElement span {
+        font-size: 14px;
+        font-weight: 400;
+        color: #bfc1c7;
+    }
+    span.label-rounded {
+        color: white;
+    }
+    .bodyElement a:active, a:focus, a:hover {
+        color: #999caa;
+    }
+    .bodyElement .text-uppercase {
+        text-transform: uppercase;
+    }
+    .bodyElement .link {
+        font-size: 13px;
+        font-weight: 600;
+    }
+    .bodyElement .img-responsive{
+      height: 100px;
+      width: 30%;
+    }
+    .bodyElement .img-thumbnail{
+      height: 100px;
+      width: 30%;
+    }
+  </style>
+{% endblock stylesheet %}
+{% block content %}
+  <div class="row">
+      {% for i in object_all %}
+          <div class="col-lg-4">
+
+                <div class="ibox-content">
+
+
+                            <h4><a href="#">{{ i.thematic }}</a></h4>
+                            <small>{{ i.address }}</small>
+                            <p>{{ i.publish_date }}</p>
+                          <button type="button" data-toggle="modal" data-target="#{{i.pk}}" class="btn btn-primary btn-sm mb10">Correccion</button>
+
+
+
+                </div>
+
+                <div class="modal fade" id="{{i.pk}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                    <form action="" method="POST" enctype="multipart/form-data">{% csrf_token %}
+
+
+                    <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLongTitle">Modal title</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        {{ form }}
+                          <input style="display:none;" value="{{i.pk}}" name="pk">
+                      </div>
+                        <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary send-data">Save changes</button>
+                      </div>
+                    </div>
+                  </div>
+                    </form>
+                </div>
+
+
+      </div>
+      {% endfor %}
+  </div>
+
+{% endblock content %}
+{% block javascript %}j
+    <script>
+
+
+$(document).ready(function(){
+        function getCookie(name){
+        var cookieValue = null;
+        if (document.cookie && document.cookie != ''){
+            var cookies = document.cookie.split(';');
+            for(var i = 0; i < cookies.length; i++){
+                var cookie = jQuery.trim(cookies[i]);
+                if(cookie.substring(0,name.length + 1) == (name + '=')){
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue
+    }
+
+      })
+    })
+    </script>
+{% endblock javascript %}
