@@ -17,6 +17,7 @@ class PostForms(forms.ModelForm):
                    'description': forms.Textarea(attrs={'class': 'form-control'})}
         fields = ('title', 'description')
 
+
 class post_form(forms.ModelForm):
     class Meta:
         model = Comment
@@ -25,5 +26,5 @@ class post_form(forms.ModelForm):
 
 class post_form_document(forms.ModelForm):
     class Meta:
-        Document = CommentArchive
+        model = CommentArchive
         fields = ['document']

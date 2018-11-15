@@ -58,101 +58,123 @@
                     <span class="label label-warning-light pull-left">{{post.comment_set.all.count}} Respuestas</span>
                     <h5 style="padding-left: 20px;">Pregunta: {{ post.title }}</h5>
                     <a href="profile.html" class="pull-right">
-                      <img alt="image" class="img-circle" src="{% static 'img/a5.jpg' %}" style="width: 38px;height: 38px;">
+                        <img alt="image" class="img-circle" src="{% static 'img/a5.jpg' %}" style="width: 38px;height: 38px;">
                     </a>
                     <small class="pull-right"> <b>Francisca Ramirez</b></small>
                   </div>
               </div>
               <div class="ibox-content col-md-12">
                 <p>{{ post.description }}</p>
-              </div>
-              <div class="ibox-content">
-                  <div class="row">
-                      <div id="feedAnswers" class="feed-activity-list">
-                          {% for x,y,z in Comments %}
-                          <div class="feed-element" align="left">
-                              <div class="row">
-                                  <div class="col-lg-12 col-md-12 col-sm-12">
-                                      <small class="pull-left">{{x.publish_date}}</small>
-                                      <a href="profile.html" class="pull-right">
-                                          <img alt="image" class="img-circle" src="{% static 'img/a1.jpg' %}">
-                                      </a>
-                                      <div class="media-body ">
-                                          <small class="pull-right" style=""> <b>{{x.author.user.first_name}} {{x.author.user.last_name}}</b></small><br>
-                                          <div class="well">{{x.description|safe}}</div>
+                {% if post.author == request.user.userprofile %}
+                <div class="row">
+                    <div class="pull-right col-md-2 col-sm-2 col-lg-2">
+                        <button class="pull-right btn btn-warning btn-circle" type="button" data-toggle="tooltip"
+                            data-placement="top" title="" data-original-title="Editar"><i class="fa fa-pencil"></i>
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="ibox-content">
+                <div class="row">
+                    <div id="feedAnswers" class="feed-activity-list">
+                        {% for x,y,z in Comments %}
+                        <div class="feed-element" align="left">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <small class="pull-left">{{x.publish_date}}</small>
+                                    <a href="profile.html" class="pull-right">
+                                        <img alt="image" class="img-circle" src="{% static 'img/a1.jpg' %}">
+                                    </a>
+                                    <div class="media-body ">
+                                        <small class="pull-right" style=""> <b>{{x.author.user.first_name}}
+                                                {{x.author.user.last_name}}</b></small><br>
+                                        <div class="well" id="description{{x.pk}}">{{x.description|safe}}</div>
+                                        <div id="edit_field{{x.pk}}" style="display:none">
+                                            <div placeholder="Escriba su comentario" class="form-control summernote" type="text"
+                                                id="summernote" name="description">{{x.description|safe}}</div>
+                                        </div>
+                                        <div style="padding-top: 2px; padding-bottom: 2px;">
 
-                                            <div style="padding-top: 2px; padding-bottom: 2px;" >
-
-                                                {% if z != "" %}
-                                                <a href="{% get_media_prefix %}{{z.document}}" title="Imagen" data-gallery>
-                                                    <span>
-                                                        <img src="{% get_media_prefix %}{{z.document}}" onclick="this.width=500;this.height=500;" onmouseout="this.width=50;this.height=50;" width="50" height="50" alt="" />
+                                            {% if z != "" %}
+                                            <a href="{% get_media_prefix %}{{z.document}}" title="Imagen" data-gallery>
+                                                <span>
+                                                    <img src="{% get_media_prefix %}{{z.document}}" onclick="this.width=500;this.height=500;"
+                                                        onmouseout="this.width=50;this.height=50;" width="50" height="50"
+                                                        alt="" />
                                                     {% if x.author.user == request.user %}
                                                         <a class="imagen" data-pk="{{z.pk}}">Eliminar</a>
                                                     {% endif %}
-                                                    </span>
-                                                </a>
+                                                </span>
+                                            </a>
 
-                                                {% endif %}
+                                            {% endif %}
 
 
-                                            </div>
+                                        </div>
 
-                                      </div>
-                                  </div>
-                                  <div class="col-lg-12 col-md-12 col-sm-12">
-                                      <div class="row">
-                                          <div class="col-md-6 col-lg-6">
-                                              <button id="ratingNumber_{{forloop.counter}}" class="ratingNumber" onclick="rateAnswer(this.id,'ratingStars_{{forloop.counter}}')" style="display: inline;"><b id="ratingNumberTxt__{{forloop.counter}}" style="font-size: 18px; color: gold;">☆ {{y}}</b></button>
-                                              <small id="ratingStars_{{forloop.counter}}" class="rating" style="display: none; font-size: 150%;">
+                                    </div>
+                                </div>
+                                <div class="col-lg-12 col-md-12 col-sm-12">
+                                    <div class="row">
+                                        <div class="col-md-6 col-lg-6">
+                                            <button id="ratingNumber_{{forloop.counter}}" class="ratingNumber" onclick="rateAnswer(this.id,'ratingStars_{{forloop.counter}}')"
+                                                style="display: inline;"><b id="ratingNumberTxt__{{forloop.counter}}"
+                                                    style="font-size: 18px; color: gold;">☆ {{y}}</b></button>
+                                            <small id="ratingStars_{{forloop.counter}}" class="rating" style="display: none; font-size: 150%;">
                                                 <span id="rating5_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
                                                 <span id="rating4_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
                                                 <span id="rating3_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
                                                 <span id="rating2_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
                                                 <span id="rating1_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
-                                              </small>
-                                          </div>
-                                          <div class="col-md-offset-3 col-md-3 col-lg-3 ">
-                                              <a class="btn btn-sm btn-warning pull-right">Editar</a>
-                                              <a class="btn btn-sm btn-danger pull-right eliminar" data-pk="{{x.pk}}" >Eliminar</a>
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
+                                            </small>
+                                        </div>
+                                        {% if x.author == request.user.userprofile %}
+                                        <div class="col-md-offset-3 col-md-3 col-lg-3 ">
+                                            <a class="btn btn-sm btn-warning pull-right editar" id="editar{{x.pk}}" data-pk="{{x.pk}}">Editar</a>
+                                            <a class="btn btn-sm btn-info pull-right aceptar" id="aceptar{{x.pk}}" style="display:none" data-pk="{{x.pk}}">Aceptar</a>
+                                            <a class="btn btn-sm btn-danger pull-right eliminar" data-pk="{{x.pk}}">Eliminar</a>
+                                        </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
 
-                          </div>
-                          {% endfor %}
-                      </div>
-                      <div class="col-lg-12 col-sm-12" style="padding-top:2%">
-                          <form id="formComment" method="POST" action="{% url 'comment_post' %}" enctype="multipart/form-data">
-                              {% csrf_token %}
-                              <input type="text" value="{{post.pk}}" name="Postpk" hidden>
-                              <div class="form-group">
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-lg-12 col-sm-12" style="padding-top:2%">
+                        <form id="formComment" method="POST" action="{% url 'comment_post' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="text" value="{{post.pk}}" name="Postpk" hidden>
+                            <div class="form-group">
                                 <label>Comentar:</label>
-                                <input placeholder="Escriba su comentario"  class="form-control summernote" type="text" id="summernote" name="description">
-                              </div>
-                              <div class="fileinput fileinput-new input-group" data-provides="fileinput">
-                                  <div class="form-control" data-trigger="fileinput">
-                                      <i class="glyphicon glyphicon-file fileinput-exists"></i>
-                                  <span class="fileinput-filename"></span>
-                                  </div>
-                                  <span class="input-group-addon btn btn-default btn-file">
-                                      <span class="fileinput-new">Adjuntar Archivo</span>
-                                      <span class="fileinput-exists">Cambiar</span>
-                                      <input type="file" id="id_document" name="document"/>
-                                  </span>
-                                  <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
-                              </div>
-                              <div class="pull-right">
-                                  <button class="btn btn-warning btn-sm" type="submit"><i class="fa fa-pencil"></i> Comentar</button>
-                              </div>
-                          </form>
-                      </div>
-                  </div>
-              </div>
-          </div>
-      </div>
-  </div>
+                                <input placeholder="Escriba su comentario" class="form-control summernote" type="text"
+                                    id="summernote" name="description">
+                            </div>
+                            <div class="fileinput fileinput-new input-group" data-provides="fileinput">
+                                <div class="form-control" data-trigger="fileinput">
+                                    <i class="glyphicon glyphicon-file fileinput-exists"></i>
+                                    <span class="fileinput-filename"></span>
+                                </div>
+                                <span class="input-group-addon btn btn-default btn-file">
+                                    <span class="fileinput-new">Adjuntar Archivo</span>
+                                    <span class="fileinput-exists">Cambiar</span>
+                                    <input type="file" id="id_document" name="document" />
+                                </span>
+                                <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
+                            </div>
+                            <div class="pull-right">
+                                <button class="btn btn-warning btn-sm" type="submit"><i class="fa fa-pencil"></i>
+                                    Comentar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock content %}
 {% block javascript %}
     <script src="{% static 'js/plugins/blueimp/jquery.blueimp-gallery.min.js' %}"></script>
@@ -244,42 +266,73 @@
           height: 100,
       });
 
-      $(".imagen").click(function () {
+        $("#imagen").click(function () {
+            alert("aqui")
+            var pk = $(this).data("pk");
+            $.ajax({
+                url: '{% url "delete_imag" %}',
+                type: "POST",
+                data: {
+                    csrfmiddlewaretoken: getCookie('csrftoken'),
+                    pk: pk
+                },
+                success: function (data) {
+                    if (data.message == "ok") {
+                        location.reload();
+                    }
+                }
+            });
+        })
+        $(function () {
+            $('form').submit(upload);
+        });
 
-          var pk = $(this).data("pk");
-          $.ajax({
-            url:'{% url "delete_imag" %}',
-            type: "POST",
-            data: {
+        $(".eliminar").click(function () {
+            var pk = $(this).data("pk");
+            let data = {
                 csrfmiddlewaretoken: getCookie('csrftoken'),
-                pk: pk
-            },success: function(data) {
-                if (data.message == "ok"){
-                    location.reload();
+                pk: pk,
+            };
+            $.ajax({
+                url: '{% url "delete_comment" %}',
+                type: "POST",
+                data: data,
+                success: function (data) {
+                    if (data.message == "ok") {
+                        location.reload();
+                    }
                 }
-              }
-          });
-      })
-      $(function() {
-        $('form').submit(upload);
-      });
-      $(".eliminar").click(function(){
-          var pk = $(this).data("pk");
-          let data = {
-              csrfmiddlewaretoken: getCookie('csrftoken'),
-              pk: pk,
-          };
-          $.ajax({
-            url:'{% url "delete_comment" %}',
-            type: "POST",
-            data: data,
-            success: function(data) {
-                if (data.message == "ok"){
-                    location.reload();
-                }
-              }
-          });
-      });
+            });
+        });
+        {#$(".aceptar").click(function () {#}
+        {#    var pk = $(this).data("pk");#}
+        {#    let data = {#}
+        {#        csrfmiddlewaretoken: getCookie('csrftoken'),#}
+        {#        pk: pk,#}
+        {#    };#}
+        {#    $.ajax({#}
+        {#        url: '{% url "update_comment" %}',#}
+        {#        type: "POST",#}
+        {#        data: data,#}
+        {#        success: function (data) {#}
+        {#            if (data.message == "ok") {#}
+				{#		$("#description"+pk).html(data.text);#}
+				{#		$("#edit_field"+pk).hide();#}
+				{#		$("#description"+pk).show();#}
+				{#		$("#editar"+pk).show();#}
+				{#		$("#aceptar"+pk).hide();#}
+				{#		location.reload();#}
+        {#            }#}
+        {#        }#}
+        {#    });#}
+        {#});#}
+        $(".editar").click(function () {
+            var pk = $(this).data("pk");
+            $("#edit_field"+pk).show();
+			$("#description"+pk).hide();
+			$("#editar"+pk).hide();
+			$("#aceptar"+pk).show();
+        });
     });
   </script>
 {% endblock javascript %}

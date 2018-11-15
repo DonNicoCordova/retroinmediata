@@ -1,18 +1,7 @@
 from django.shortcuts import render, redirect
-from django.urls import reverse
 from .forms import MinutasForm, RefuseMinutes
 from minutas.models import *
-<<<<<<< HEAD
-from retro_auth.models import *
-from django.http import JsonResponse
-=======
-from django.http import JsonResponse
-from django.http import HttpResponseRedirect
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from retro.views import *
->>>>>>> origin/Scrum-4
 
 # Create your views here.
 
@@ -38,7 +27,6 @@ def minutas(request):
             return JsonResponse({'message': 'ok'})
 
     else:
-<<<<<<< HEAD
         print("holi")
         template = "minutas/listar_minutas.html"
         return render(request, template, data)
@@ -57,7 +45,3 @@ def crear_minuta(request):
     else:
         form = MinutasForm()
     return render(request, "minutas/_minutas.html", {'form':form})
-
-=======
-        return redirect('index')
->>>>>>> origin/Scrum-4
