@@ -1,3 +1,6 @@
 *.pyc
 .env
+.idea
+.vscode
 media
+db.sqlite3

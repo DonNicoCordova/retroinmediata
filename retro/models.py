@@ -159,7 +159,7 @@ class CommentArchive(models.Model):
     document = models.FileField(upload_to='Foro/Comment/%Y/%m/%d/',default=None)
 
     def __str__(self):
-        return "el comentario %s tiene como archivo %s" % (self.comment.description, self.document.url)
+        return "el comentario %s tiene como archivo %s" % (self.comment.description, self.document)
 
 
 class CommentRanking(models.Model):

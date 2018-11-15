@@ -25,5 +25,5 @@ class post_form(forms.ModelForm):
 
 class post_form_document(forms.ModelForm):
     class Meta:
-        model = CommentArchive
+        Document = CommentArchive
         fields = ['document']

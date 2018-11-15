@@ -12,5 +12,7 @@ class UserProfile(models.Model):
     is_sacademic = models.BooleanField(default=False)
     is_dcareer = models.BooleanField(default=False)
 
+    umbral = models.PositiveIntegerField(default=1)
+    
     def __str__(self):
-        return "%s %s Rut: %s" % (self.user.first_name, self.user.last_name, self.rut)
+        return "%s Rut: %s Umbral: %s" % (self.user, self.rut, self.umbral)

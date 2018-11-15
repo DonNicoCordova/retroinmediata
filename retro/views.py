@@ -145,6 +145,8 @@ def post_details(request, pk):
         post = Post.objects.get(pk=pk)
         all_comment = Comment.objects.filter(post=post)
         listComments = []
+
+
         for i in all_comment:
             rankingSum = 0
             rankingAvg = 0.0
@@ -158,7 +160,11 @@ def post_details(request, pk):
             if (numRatings != 0):
                 rankingAvg = rankingSum / numRatings
 
-            listComments.append(tuple((i, rankingAvg)))
+            try:
+                file = CommentArchive.objects.get(comment=i)
+                listComments.append(tuple((i, rankingAvg, file)))
+            except:
+                listComments.append(tuple((i, rankingAvg, "")))
         data['Comments'] = listComments
         data['post'] = post
         if request.method == "POST":
@@ -274,58 +280,78 @@ def question(request):
 
 
 def forum(request):
-    template_name = 'forum.html'
+        template_name = 'forum.html'
 
-    # For Testing
-    user = request.user.userprofile
-    sectionPk = 1
-    questionPk = 1
-    allThreads = Thread.objects.filter(section=sectionPk)
-    section = Section.objects.get(pk=allThreads[0].section.id)
-    sectionNRC = section.nrc
+        #For Testing
+        user = UserProfile.objects.get(rut="111111111")
+        sectionPk = 1
 
-    listThreads = []
-    for i in allThreads:
-        rankingSum = 0
-        rankingAvg = 0.0
-        numRatings = 0
-        rankings = ThreadRanking.objects.filter(thread=i)
+        allThreads = Thread.objects.filter(section=sectionPk)
+        section = Section.objects.get(pk=allThreads[0].section.id)
+        sectionNRC = section.nrc
 
-        for j in rankings:
-            rankingSum += j.rating
-            numRatings += 1
-
-        if (numRatings != 0):
-            rankingAvg = rankingSum / numRatings
-
-        listThreads.append(tuple((i, rankingAvg)))
-
-    if request.POST:
-        if ThreadRanking.objects.filter(userprofile=user.id, thread=request.POST["thread"]).exists():
-            trank = ThreadRanking.objects.get(userprofile=user.id, thread=request.POST["thread"])
-            trank.rating = request.POST["rating"]
-        else:
-            thread = Comment.objects.get(pk=request.POST["thread"])
-            trank = ThreadRanking(userprofile=user, thread=thread, rating=request.POST["rating"])
-        trank.save()
-        allThreads = Comment.objects.filter(post=questionPk)
-        dictRatings = {}
-
+        listThreads = []
         for i in allThreads:
             rankingSum = 0
             rankingAvg = 0.0
             numRatings = 0
-            rankings = CommentRanking.objects.filter(comment=i)
+            rankings = ThreadRanking.objects.filter(thread=i)
 
             for j in rankings:
                 rankingSum += j.rating
                 numRatings += 1
+
             if (numRatings != 0):
                 rankingAvg = rankingSum / numRatings
-                dictRatings[i.pk] = rankingAvg
-        # print (request.POST["rating"])
-        return JsonResponse(dictRatings)
-    return render(request, template_name, {"Threads": listThreads, "SectionNRC": sectionNRC})
+
+            listThreads.append(tuple((i,rankingAvg)))
+
+        if request.POST:
+            if request.POST['rtype']=='sort':
+                sortedList = []
+                if request.POST['order']=='Ascending':
+                    print ("SORTING ASC")
+                    sortedList = sorted(listThreads,key=lambda t: t[1])
+                    print ("Ascending: ",sortedList)
+                elif request.POST['order']=='Descending':
+                    print ("SORTING DES")
+                    sortedList = sorted(listThreads,reverse=True, key=lambda t: t[1])
+                    print ("Descending: ",sortedList)
+                dictThreadsSorted = {}
+
+                for index,items in enumerate(sortedList, start=1):
+                    dictThreadsSorted[index] = {}
+                    dictThreadsSorted[index]["pk"] = items[0].pk
+                    dictThreadsSorted[index]["name"] = items[0].name
+                    dictThreadsSorted[index]["publish_date"] = items[0].publish_date
+                    dictThreadsSorted[index]["rating"] = items[1]
+                return JsonResponse(dictThreadsSorted)
+
+            if request.POST['rtype']=='rate':
+                if ThreadRanking.objects.filter(userprofile=user.id,thread=request.POST["thread"]).exists():
+                    trank = ThreadRanking.objects.get(userprofile=user.id,thread=request.POST["thread"])
+                    trank.rating = request.POST["rating"]
+                else:
+                    thread = Thread.objects.get(pk=request.POST["thread"])
+                    trank = ThreadRanking(userprofile=user,thread=thread,rating=request.POST["rating"])
+                trank.save()
+                allThreads = Thread.objects.filter(section=sectionPk)
+                dictRatings = {}
+
+                for i in allThreads:
+                    rankingSum = 0
+                    rankingAvg = 0.0
+                    numRatings = 0
+                    rankings = ThreadRanking.objects.filter(thread=i)
+
+                    for j in rankings:
+                        rankingSum += j.rating
+                        numRatings += 1
+                    if (numRatings != 0):
+                        rankingAvg = rankingSum / numRatings
+                        dictRatings[i.pk] = rankingAvg
+                return JsonResponse(dictRatings)
+        return render(request, template_name, {"Threads":listThreads,"SectionNRC":sectionNRC})
 
 
 @csrf_exempt
@@ -374,4 +400,10 @@ def delete_comment(request):
     data = {}
     comment_id = request.POST["pk"]
     comment = Comment.objects.get(pk=comment_id).delete()
+    return JsonResponse({'message': 'ok'})
+
+def delete_imag(request):
+    data = {}
+    print("holi")
+    archive = CommentArchive.objects.get(pk=request.POST["pk"]).delete()
     return JsonResponse({'message': 'ok'})
