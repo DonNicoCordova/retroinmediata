@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'minutas',
     'alertas',
     'auditorias',
+    'bootstrap4'
 ]
 
 MIDDLEWARE = [

@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from .forms import MinutasForm, RefuseMinutes
 from minutas.models import *
 from retro.views import *
+from django.core.exceptions import ValidationError
 
 # Create your views here.
 
@@ -42,6 +43,9 @@ def crear_minuta(request):
         if form.is_valid():
             form.save()
             return redirect(reverse('crear_minuta')+"?ok")
-    else:
-        form = MinutasForm()
-    return render(request, "minutas/_minutas.html", {'form':form})
+        else:
+            form = MinutasForm()
+        return render(request, "minutas/_minutas.html", {'form':form})
+    else:    
+        return redirect('index')
+

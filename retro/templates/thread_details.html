@@ -162,16 +162,34 @@
                   {{ postform.description }}
               </div>
           </div>
-
           <div class="modal-footer">
               <button type="button" class="btn btn-white" data-dismiss="modal">Cerrar</button>
               <button type="submit" class="btn btn-primary">Crear Pregunta</button>
+              
           </div>
         </form>
       </div>
   </div>
 </div>
-
+{% if postparecido == 1 %}
+<div class="modal inmodal fade" id="mensaje" tabindex="-1" role="dialog"  aria-hidden="true">
+  <div class="modal-dialog">
+      <div class="modal-content">
+          {% csrf_token %}
+          <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+              <h4 class="modal-title">{{request.user}}</h4>
+          </div>
+          <div class="modal-body text-center">
+            <label for="">La pregunta que quieres hacer se parece a: {{postfrase}}</label>
+          </div>
+          <div class="modal-footer">
+              <button type="button" class="btn btn-white" data-dismiss="modal">Cerrar</button>
+          </div>
+      </div>
+  </div>
+</div>
+{% endif %}
 {% endblock content %}
 
 
@@ -195,6 +213,9 @@
     }
     
     $(document).ready(function(){
+        {% if postparecido == 1 %}
+        $('#mensaje').modal('show');
+         {% endif %}
       $(".eliminar").click(function(){
         var pk = $(this).data("pk");
         let data = {
