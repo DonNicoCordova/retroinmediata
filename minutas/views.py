@@ -35,6 +35,20 @@ def minutas(request):
     template = "minutas/listar_minutas.html"
     return render(request, template, data)
 
+def edit_minute(request, minute_id):
+    data = {}
+    data["type"] = 1 
+    data["request"] = 'POST' 
+    if request.POST:
+        formMinute = Minute(request.POST, request.FILES, instance=Minute.objects.get(pk=minute_id))
+        if formMinute.is_valid():
+            formMinute.save()
+            return redirect('edit_minuta')
+    template_name = 'minutas/edit_minuta.html'
+    data['data'] = Minute(instance=Minute.objects.get(pk=minute_id))
+
+    return render(request, template_name, data)
+
 def crear_minuta(request):
     privilegio = UserProfile.objects.get(user=request.user)
     #if privilegio.is_dcareer or privilegio.is_sacademic:

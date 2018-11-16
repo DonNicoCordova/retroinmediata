@@ -80,6 +80,7 @@ Minutas
                             <small>{{ i.address }}</small>
                             <p>{{ i.publish_date }}</p>
                           <button type="button" data-toggle="modal" data-target="#{{i.pk}}" class="btn btn-primary btn-sm mb10">Correccion</button>
+                          <button type="button" data-toggle="modal" href= "{% url 'edit_minuta' i.pk %}" method="request" class="btn btn-succesful btn-sm mb10">Modificar</button>
 
 
 
