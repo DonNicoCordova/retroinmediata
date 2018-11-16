@@ -16,8 +16,8 @@ def minutas(request):
     pass
 
 def crear_minuta(request):
-    #privilegio = UserProfile.objects.get(user=request.user)
-    #if privilegio.is_dcareer or privilegio.is_sacademic:
+    privilegio = UserProfile.objects.get(user=request.user)
+    if privilegio.is_dcareer or privilegio.is_sacademic:
 
         if request.method == 'POST':
             form = MinutasForm(request.POST, request.FILES)
@@ -27,7 +27,7 @@ def crear_minuta(request):
         else:
             form = MinutasForm()
         return render(request, "minutas/_minutas.html", {'form':form})
-    #else:
-     #   return redirect('index')
-from django.core.exceptions import ValidationError
+    else:
+        return redirect('index')
+
 

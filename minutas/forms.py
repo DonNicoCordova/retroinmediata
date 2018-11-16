@@ -20,19 +20,3 @@ class MinutasForm(forms.Form):
     address = forms.CharField(max_length=100)
     document = forms.FileField(required=False, validators=[filee])
 
-
-
-
-
-"""
-class MinutasForm(forms.ModelForm):
-    def file_size(value): # add this to some file where you can import it from
-        limit = 2 * 1024 * 1024
-        if value.size > limit:
-            raise ValidationError('File too large. Size should not exceed 2 MiB.')
-
-    class Meta:
-        model = Minute
-        fields = ['thematic', 'address','document']
-        document = forms.FileField(required=False, validators=[file_size])
-"""
