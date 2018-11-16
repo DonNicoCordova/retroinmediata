@@ -28,7 +28,7 @@ module_dict = {"D1": "08:30 - 10:10", "D2": "10:20 - 12:00",
                "V3": "20:40 - 22:20"}
 
 
-def coincidencia(nuevo_post):
+def coincidencia(nuevo_post,Thread):
     
     lista = []
     lista2= []
@@ -36,7 +36,7 @@ def coincidencia(nuevo_post):
     repetido = []
     
     #se traen los post y se pasan a mayuscula para poder comparar
-    for x in Post.objects.all():
+    for x in Post.objects.filter(thread = Thread):
         lista.append(x.title.upper())
     
     # keywords_2 sera el post recibido
@@ -64,16 +64,16 @@ def coincidencia(nuevo_post):
                         repetido.append(b)
 
             elif len(palubria)==1 and palubria == aux:
-                print("ya hay un tema parecido: ",palubria)
+                return([True,palubria])
                 
         porcentaje1 = 100*len(repetido)/len(key3) #66.6%
         print(porcentaje1)
 
         if porcentaje1 > 65:
             # data para html para mostrar alerta de coincidencia
-            return(True)
+            return([True,palubria])
         
-    return(False)
+    return([False,""])
 
 
 @login_required(login_url='/auth/login/')
@@ -154,16 +154,25 @@ def thread_details(request, pk):
         thread = Thread.objects.get(pk=pk)
         data['postform'] = PostForms()
         data['formvalid'] = True
+        data['postparecido']=0
         if request.POST:
             data['postform'] = PostForms(request.POST)
             if data['postform'].is_valid():
-                data['postform'] = data['postform'].save(commit=False)
-                data['postform'].author = request.user.userprofile
-                data['postform'].thread = thread
-                data['postform'].save()
-                return HttpResponseRedirect(reverse('thread_details', kwargs={'pk': pk}))
+                a = coincidencia(request.POST["title"],thread)
+                print(a)
+                if a[0] == True:
+                    frase = ' '.join(a[1])
+                    data['postparecido']=1
+                    data['postfrase'] = frase
+                else:
+                    data['postform'] = data['postform'].save(commit=False)
+                    data['postform'].author = request.user.userprofile
+                    data['postform'].thread = thread
+                    data['postform'].save()
+                    return HttpResponseRedirect(reverse('thread_details', kwargs={'pk': pk}))
             else:
-                data['formvalid'] = False
+                if a[0] != True:
+                    data['formvalid'] = False
         data['thread'] = thread
         page = request.GET.get('page')
         search = request.GET.get('search')
