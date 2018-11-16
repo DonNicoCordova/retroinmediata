@@ -1,27 +1,28 @@
-from django.shortcuts import render
-from django.shortcuts import redirect
+from django.shortcuts import render, reverse, redirect
 from retro_auth.models  import *
 from retro.models import *
 from auditorias.forms import edit_umbral
 from auditorias.models import *
 import datetime
+from django.http import HttpResponseRedirect
+
 
 
 def auditorias(request):
-    pass
-#    # solo no funciona cuando no a comentado nadie o solo el profe
-#    docentes = UserProfile.objects.filter(is_teacher=True)
-#    print(docentes)
-#    for docente in docentes:
-#        no_contestadas = []
-#        secciones = docente.section_set.all()
-#        for post in Post.objects.filter(threadsectionteacher=docente):
-#            if post.comment_set.filter(author=docente).exists():
-#                pass
-#            else:
-#                no_contestadas.append(post)
+    data = {}
+    docentes = UserProfile.objects.filter(is_teacher=True)
+    data['docentes'] = docentes
+    print(docentes)
+    for docente in docentes:
+        no_contestadas = []
+        secciones = docente.section_set.all()
+        for post in Post.objects.filter(thread__section__teacher=docente):
+            if post.comment_set.filter(author=docente).exists():
+                pass
+            else:
+                no_contestadas.append(post)
 
-#    return render(request, "auditorias/audi2.html", data)
+    return render(request, "auditorias/auditorias.html", data)
 
 
 def historial_auditorias(request):
@@ -46,17 +47,18 @@ def edit_Umbral(request):
     # teacher=UserProfile.objects.all()
     if umbral.is_teacher == True:
         if request.method == 'GET':
+            print ('holi')
             form = edit_umbral(instance=umbral)
         else:
             form = edit_umbral(request.POST,instance=umbral)
             if form.is_valid():
                 form.save()
                 return redirect('auditorias')
-            return render(request, 'auditorias/edit_umbral.html', data)
         data['form'] = form
+        print ('gabito gay')
         return render(request, 'auditorias/edit_umbral.html', data)
     else:
-        return redirect('edit_umbral.html')
+        return redirect('auditorias')
 
 
 def auditorias_aut(request):
