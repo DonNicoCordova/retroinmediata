@@ -1,27 +1,32 @@
-from django.shortcuts import render
-from django.shortcuts import redirect
+from django.shortcuts import render, redirect
 from retro_auth.models  import *
 from retro.models import *
-from auditorias.forms import edit_umbral
-from auditorias.models import *
+from auditorias.forms import edit_umbral, ForoAuditForm
 import datetime
+from django.contrib import messages
 
 
+#arreglar
 def auditorias(request):
-    pass
 #    # solo no funciona cuando no a comentado nadie o solo el profe
-#    docentes = UserProfile.objects.filter(is_teacher=True)
-#    print(docentes)
-#    for docente in docentes:
-#        no_contestadas = []
-#        secciones = docente.section_set.all()
-#        for post in Post.objects.filter(threadsectionteacher=docente):
-#            if post.comment_set.filter(author=docente).exists():
-#                pass
-#            else:
-#                no_contestadas.append(post)
-#
-#    return render(request, "auditorias/audi2.html", data)
+    data = {}
+    data['form'] = ForoAuditForm()
+    if request.POST:
+        data['form'] = ForoAuditForm(request.POST)
+        if data['form'].is_valid():
+            print(request.POST)
+            if data['form'].is_teacher == True:
+                no_contestadas = []
+                secciones = data['form'].section_set.all()
+                for post in Post.objects.filter(thread__section__teacher=docente):
+                    if post.comment_set.filter(author=docente).exists():
+                        pass
+                else:
+                    no_contestadas.append(post)
+            else:
+                return render(request, "auditorias/auditorias.html", data)
+
+    return render(request, "auditorias/auditorias.html", data)
 
 
 def historial_auditorias(request):
