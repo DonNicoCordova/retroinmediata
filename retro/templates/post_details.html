@@ -48,28 +48,42 @@
 </div>
 {% endblock breadcrumb %}
 {% block content %}
-  <div class="row" >
-      <div class="col-lg-4" style="width: 100%;">
-          <div class="ibox float-e-margins">
-              <div class="ibox-title" style="width: 100%;height: 100px;">
-                  <small class="pull-left">Ayer 5:20 pm - 12.06.2018</small>
-                  <br>
-                  <div class="ibox-tools">
-                    <span class="label label-warning-light pull-left">{{post.comment_set.all.count}} Respuestas</span>
-                    <h5 style="padding-left: 20px;">Pregunta: {{ post.title }}</h5>
-                    <a href="profile.html" class="pull-right">
-                        <img alt="image" class="img-circle" src="{% static 'img/a5.jpg' %}" style="width: 38px;height: 38px;">
-                    </a>
-                    <small class="pull-right"> <b>Francisca Ramirez</b></small>
-                  </div>
-              </div>
-              <div class="ibox-content col-md-12">
-                <p>{{ post.description }}</p>
+<div class="row">
+    <div class="col-lg-4" style="width: 100%;">
+        <div class="ibox float-e-margins">
+            <div class="ibox-title" style="width: 100%;height: 100px;">
+                <small class="pull-left">Ayer 5:20 pm - 12.06.2018</small>
+                <br>
+                <div class="ibox-tools">
+                    <div id="title_edit" style="display:none">
+                        <div class="form-group">
+                            <label for="exampleInputEmail2" class="sr-only">Titulo de Pregunta:</label>
+                            <input type="text" placeholder="Ingrese titulo de la pregunta..." id="titulo_pregunta" class="form-control" value="{{post.title}}">
+                        </div>
+                    </div>
+                    <div id="title">
+                        <span class="label label-info pull-left">{{post.comment_set.all.count}} Respuestas</span>
+                        <h5 style="padding-left: 20px;" id="post_title">Pregunta: {{ post.title }}</h5>
+                        <a href="profile.html" class="pull-right">
+                            <img alt="image" class="img-circle" src="{% static 'img/a5.jpg' %}" style="width: 38px;height: 38px;">
+                        </a>
+                        <small class="pull-right"> <b>{{post.author}}</b></small>
+                    </div>
+                </div>
+            </div>
+            <div class="ibox-content col-md-12">
+                <p id="post_description">{{ post.description|safe }}</p>
+                <div id="post_edit" style="display:none">
+                    <div class="summernote form-control" id="summernote_post">{{ post.description }}</div>
+                </div>
                 {% if post.author == request.user.userprofile %}
                 <div class="row">
                     <div class="pull-right col-md-2 col-sm-2 col-lg-2">
                         <button class="pull-right btn btn-warning btn-circle" type="button" data-toggle="tooltip"
-                            data-placement="top" title="" data-original-title="Editar"><i class="fa fa-pencil"></i>
+                            data-placement="top" title="" data-original-title="Editar" id="editar_pregunta"><i class="fa fa-pencil"></i>
+                        </button>
+                        <button class="pull-right btn btn-info btn-circle" type="button" data-toggle="tooltip"
+                            data-placement="top" title="" data-original-title="Aceptar" id="aceptar_cambio" style="display:none"><i class="fa fa-check"></i>
                         </button>
                     </div>
                 </div>
@@ -92,7 +106,7 @@
                                         <div class="well" id="description{{x.pk}}">{{x.description|safe}}</div>
                                         <div id="edit_field{{x.pk}}" style="display:none">
                                             <div placeholder="Escriba su comentario" class="form-control summernote" type="text"
-                                                id="summernote" name="description">{{x.description|safe}}</div>
+                                                id="summernote{{x.pk}}" name="description">{{x.description|safe}}</div>
                                         </div>
                                         <div style="padding-top: 2px; padding-bottom: 2px;">
 
@@ -107,12 +121,8 @@
                                                     {% endif %}
                                                 </span>
                                             </a>
-
                                             {% endif %}
-
-
                                         </div>
-
                                     </div>
                                 </div>
                                 <div class="col-lg-12 col-md-12 col-sm-12">
@@ -179,7 +189,7 @@
 {% block javascript %}
     <script src="{% static 'js/plugins/blueimp/jquery.blueimp-gallery.min.js' %}"></script>
     <script src="{% static 'js/plugins/jasny/jasny-bootstrap.min.js' %}"></script>
-    
+
   <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js"></script>
   <script>
     function getCookie(name){
@@ -189,60 +199,62 @@
           for(var i = 0; i < cookies.length; i++){
               var cookie = jQuery.trim(cookies[i]);
 
-              if(cookie.substring(0,name.length + 1) == (name + '=')){
-                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                  break;
-              }
-          }
-      }
-      return cookieValue
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue
     }
-    function rateAnswer(idRatingNumber,idRatingStar) {
-       var x = document.getElementById(idRatingNumber);
-       var y = document.getElementById(idRatingStar);
-       if (y.style.display === "none") {
-           x.style.display = "none";
-           y.style.display = "inline";
-         } else {
-           x.style.display = "inline";
-           y.style.display = "none";
-         }
+
+    function rateAnswer(idRatingNumber, idRatingStar) {
+        var x = document.getElementById(idRatingNumber);
+        var y = document.getElementById(idRatingStar);
+        if (y.style.display === "none") {
+            x.style.display = "none";
+            y.style.display = "inline";
+        } else {
+            x.style.display = "inline";
+            y.style.display = "none";
+        }
     }
-    function postRating(commentPk,idRatingNumber,idRatingStar,idRatingNumberTxt,idStar) {
-      var x = document.getElementById(idRatingNumber);
-      var y = document.getElementById(idRatingStar);
-      var z = document.getElementById(idRatingNumberTxt);
-      if (x.style.display === "none") {
-          //window.alert(comment.description)
-          var ratingUser = idStar.replace("rating", "").split("_")[0];
 
-          $.ajax({
-            url : "{% url 'question' %}",
-            type : "POST",
-            data : {
-              rating : ratingUser,
-              comment : commentPk,
-              csrfmiddlewaretoken : getCookie('csrftoken'),
-            },
-            success : function(data){
-              z.innerHTML = '☆ ' + data[commentPk];
-              x.style.display = "inline";
-              y.style.display = "none";
-              //console.log(data);
-              //console.log(commentPk);
-              //console.log(data[commentPk]);
-            },
-          });
+    function postRating(commentPk, idRatingNumber, idRatingStar, idRatingNumberTxt, idStar) {
+        var x = document.getElementById(idRatingNumber);
+        var y = document.getElementById(idRatingStar);
+        var z = document.getElementById(idRatingNumberTxt);
+        if (x.style.display === "none") {
+            //window.alert(comment.description)
+            var ratingUser = idStar.replace("rating", "").split("_")[0];
 
-      } else {
-          x.style.display = "none";
-          y.style.display = "inline";
-      }
+            $.ajax({
+                url: "{% url 'question' %}",
+                type: "POST",
+                data: {
+                    rating: ratingUser,
+                    comment: commentPk,
+                    csrfmiddlewaretoken: getCookie('csrftoken'),
+                },
+                success: function (data) {
+                    z.innerHTML = '☆ ' + data[commentPk];
+                    x.style.display = "inline";
+                    y.style.display = "none";
+                    //console.log(data);
+                    //console.log(commentPk);
+                    //console.log(data[commentPk]);
+                },
+            });
+
+        } else {
+            x.style.display = "none";
+            y.style.display = "inline";
+        }
     }
     function upload(event) {
         event.preventDefault();
         var data = new FormData($('form').get(0));
-        data.append('content',$('#summernote').summernote('code'));
+        data.append('content', $('#summernote').summernote('code'));
         $.ajax({
             url: $(this).attr('action'),
             type: $(this).attr('method'),
@@ -250,21 +262,21 @@
             cache: false,
             processData: false,
             contentType: false,
-            success: function(data) {
+            success: function (data) {
                 $('#summernote').summernote('reset');
                 $("#saved_file").val("");
-                if (data.message == "ok"){
+                if (data.message == "ok") {
                     location.reload();
                 }
             }
         });
         return false;
     }
-    $(document).ready(function(){
-      $('.summernote').summernote({
-          toolbar: false,
-          height: 100,
-      });
+    $(document).ready(function () {
+        $('.summernote').summernote({
+            toolbar: false,
+            height: 100,
+        });
 
         $("#imagen").click(function () {
             alert("aqui")
@@ -304,35 +316,73 @@
                 }
             });
         });
-        {#$(".aceptar").click(function () {#}
-        {#    var pk = $(this).data("pk");#}
-        {#    let data = {#}
-        {#        csrfmiddlewaretoken: getCookie('csrftoken'),#}
-        {#        pk: pk,#}
-        {#    };#}
-        {#    $.ajax({#}
-        {#        url: '{% url "update_comment" %}',#}
-        {#        type: "POST",#}
-        {#        data: data,#}
-        {#        success: function (data) {#}
-        {#            if (data.message == "ok") {#}
-				{#		$("#description"+pk).html(data.text);#}
-				{#		$("#edit_field"+pk).hide();#}
-				{#		$("#description"+pk).show();#}
-				{#		$("#editar"+pk).show();#}
-				{#		$("#aceptar"+pk).hide();#}
-				{#		location.reload();#}
-        {#            }#}
-        {#        }#}
-        {#    });#}
-        {#});#}
+        $(".aceptar").click(function () {
+            var pk = $(this).data("pk");
+            let data = {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                pk: pk,
+                comment:$('#summernote'+pk).summernote('code'),
+            };
+            console.log(data)
+            $.ajax({
+                url: '{% url "update_comment" %}',
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    if (response.message == "ok") {
+                        console.log("Entre al if");
+						$("#description"+pk).html(response.text);
+						$("#edit_field"+pk).hide();
+						$("#description"+pk).show();
+						$("#editar"+pk).show();
+						$("#aceptar"+pk).hide();
+                    }
+                }
+            });
+        });
         $(".editar").click(function () {
             var pk = $(this).data("pk");
             $("#edit_field"+pk).show();
 			$("#description"+pk).hide();
 			$("#editar"+pk).hide();
 			$("#aceptar"+pk).show();
+
+        });
+        $("#editar_pregunta").click(function () {
+            $("#title_edit").show();
+            $("#title").hide();
+            $("#aceptar_cambio").show();
+            $("#editar_pregunta").hide();
+            $("#post_edit").show();
+            $("#post_description").hide();
+        });
+        $("#aceptar_cambio").click(function () {
+            let data = {
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                pk: "{{post.pk}}",
+                title: $("#titulo_pregunta").val(),
+                comment:$('#summernote_post').summernote('code'),
+            };
+            console.log(data)
+            $.ajax({
+                url: '{% url "update_post" %}',
+                type: "POST",
+                data: data,
+                success: function (response) {
+                    if (response.message == "ok") {
+                        console.log("Entre al if");
+						$("#post_description").html(response.text);
+						$("#post_title").html(response.title);
+						$("#title_edit").hide();
+                        $("#title").show();
+                        $("#aceptar_cambio").hide();
+                        $("#editar_pregunta").show();
+                        $("#post_edit").hide();
+                        $("#post_description").show();
+                    }
+                }
+            });
         });
     });
-  </script>
+</script>
 {% endblock javascript %}

@@ -490,3 +490,28 @@ def frequent_questions_teacher(request):
 	data={}
 	template_name = "frequent_questions_teacher.html"
 	return render(request, template_name,data)
+
+
+def update_comment(request):
+    data = {}
+    comment_id = request.POST["pk"]
+    comment = Comment.objects.get(pk=comment_id)
+    comment.description = request.POST["comment"]
+    comment.save()
+    data["text"] = comment.description
+    data["message"] = "ok"
+    return JsonResponse(data)
+
+def update_post(request):
+    data = {}
+    print(request.POST)
+    post_id = request.POST["pk"]
+    post = Post.objects.get(pk=post_id)
+    post.title = request.POST['title']
+    post.save()
+    post.description = request.POST["comment"]
+    post.save()
+    data["text"] = post.description
+    data["title"] = post.title
+    data["message"] = "ok"
+    return JsonResponse(data)
