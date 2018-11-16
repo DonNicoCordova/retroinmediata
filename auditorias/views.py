@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, reverse, redirect
 from retro_auth.models  import *
 from retro.models import *
 from auditorias.forms import edit_umbral, ForoAuditForm
 import datetime
 from django.contrib import messages
+from django.http import HttpResponseRedirect
 
 
 #arreglar
@@ -24,7 +25,6 @@ def auditorias(request):
                     no_contestadas.append(post)
         else:
             return render(request, "auditorias/auditorias.html", data)
-
     return render(request, "auditorias/auditorias.html", data)
 
 
@@ -33,12 +33,12 @@ def historial_auditorias(request):
     data['auditoria'] = ForoAudit.objects.all()
     template_name = "auditorias/_auditorias.html"
     return render(request, template_name, data)
-    
+
 def buscar_auditorias(request):
     template_name = "auditorias/_auditorias2.html"
     data = {}
     data['auditorias'] = ForoAudit.objects.all()
-    
+
     return render(request, template_name, data)
 
 def edit_Umbral(request):
@@ -50,14 +50,15 @@ def edit_Umbral(request):
     # teacher=UserProfile.objects.all()
     if umbral.is_teacher == True:
         if request.method == 'GET':
+            print ('holi')
             form = edit_umbral(instance=umbral)
         else:
             form = edit_umbral(request.POST,instance=umbral)
             if form.is_valid():
                 form.save()
                 return redirect('auditorias')
-            return render(request, 'auditorias/edit_umbral.html', data)
         data['form'] = form
+        print ('gabito gay')
         return render(request, 'auditorias/edit_umbral.html', data)
     else:
         return redirect('auditorias')
@@ -69,6 +70,7 @@ def auditorias_aut(request):
         print (x)
         comment = Comment.objects.all()
         print(comment)
+        return redirect('../edit_umbral.html')
     # data = {}
     # for i in comment:
     #     data['first_name'] = i.author.user.first_name
