@@ -11,20 +11,19 @@ def auditorias(request):
 #    # solo no funciona cuando no a comentado nadie o solo el profe
     data = {}
     data['form'] = ForoAuditForm()
+    print("chao")
     if request.POST:
         data['form'] = ForoAuditForm(request.POST)
         if data['form'].is_valid():
-            print(request.POST)
-            if data['form'].is_teacher == True:
-                no_contestadas = []
-                secciones = data['form'].section_set.all()
-                for post in Post.objects.filter(thread__section__teacher=docente):
-                    if post.comment_set.filter(author=docente).exists():
-                        pass
+            no_contestadas = []
+            secciones = data['form'].section_set.all()
+            for post in Post.objects.filter(thread__section__teacher=docente):
+                if post.comment_set.filter(author=docente).exists():
+                    pass
                 else:
                     no_contestadas.append(post)
-            else:
-                return render(request, "auditorias/auditorias.html", data)
+        else:
+            return render(request, "auditorias/auditorias.html", data)
 
     return render(request, "auditorias/auditorias.html", data)
 

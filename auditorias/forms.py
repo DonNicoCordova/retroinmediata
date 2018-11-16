@@ -8,6 +8,10 @@ class edit_umbral(forms.ModelForm):
         fields = ['umbral']
         
 class ForoAuditForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(ForoAuditForm, self).__init__(*args, **kwargs)
+        self.fields['teacher'] = forms.ModelChoiceField(queryset=UserProfile.objects.filter(is_teacher = True), required=True)
     class Meta:
+        print("hola")
         model = ForoAudit
         fields = ('teacher',)
