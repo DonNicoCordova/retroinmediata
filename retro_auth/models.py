@@ -15,4 +15,4 @@ class UserProfile(models.Model):
     umbral = models.PositiveIntegerField(default=1)
     
     def __str__(self):
-        return "%s Rut: %s Umbral: %s" % (self.user, self.rut, self.umbral)
+        return "%s %s" % (self.user.first_name,self.user.last_name)
