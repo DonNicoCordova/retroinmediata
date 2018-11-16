@@ -80,6 +80,7 @@ Minutas
                             <small>{{ i.address }}</small>
                             <p>{{ i.publish_date }}</p>
                           <button type="button" data-toggle="modal" data-target="#{{i.pk}}" class="btn btn-primary btn-sm mb10">Correccion</button>
+                          <button type="button" data-toggle="modal" href= "{% url 'edit_minuta' i.pk %}" method="request" class="btn btn-succesful btn-sm mb10">Modificar</button>
 
 
 
@@ -115,4 +116,29 @@ Minutas
       {% endfor %}
   </div>
 
+
 {% endblock content %}
+{% block javascript %}j
+    <script>
+
+
+$(document).ready(function(){
+        function getCookie(name){
+        var cookieValue = null;
+        if (document.cookie && document.cookie != ''){
+            var cookies = document.cookie.split(';');
+            for(var i = 0; i < cookies.length; i++){
+                var cookie = jQuery.trim(cookies[i]);
+                if(cookie.substring(0,name.length + 1) == (name + '=')){
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue
+    }
+
+      })
+    })
+    </script>
+{% endblock javascript %}
