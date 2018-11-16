@@ -7,7 +7,8 @@ from django.contrib.auth.decorators import login_required
 from retro_auth.models import UserProfile
 from django.contrib import messages
 from django.shortcuts import render
-from .models import*
+from minutas.models import *
+from .models import *
 from django.http import JsonResponse
 
 
@@ -102,3 +103,4 @@ def alerta(request):
         data['form2'] = Alerta2Form()
     template_name = 'alertas.html'
     return render(request, template_name, data)
+
