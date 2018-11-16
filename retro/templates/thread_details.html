@@ -84,6 +84,7 @@
                         </a>
                         <div class="vote-info">
                             <i class="fa fa-question-circle-o"></i> <a href="#">Respuestas ({{ x.comment_set.all.count }})</a>
+                            <i class="fa fa-check"></i> <a href="#">Valoraciones ({{ x.postranking_set.all.count }})</a>
                             <i class="fa fa-clock-o"></i> <a href="#">{% with x.getDiference as difference %} {{ difference }} {% if difference == 1 %}Hora{% else %}Horas{% endif %} atrás {% endwith %}</a>
 {#                                <i class="fa fa-user"></i> <a href="#">Andrew Williams</a>#}
                         </div>
@@ -192,6 +193,7 @@
       }
       return cookieValue
     }
+    
     $(document).ready(function(){
       $(".eliminar").click(function(){
         var pk = $(this).data("pk");

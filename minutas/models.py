@@ -19,6 +19,7 @@ class Minute(models.Model):
     thematic = models.CharField(max_length=50)
     description = models.CharField(max_length=500)
     address = models.CharField(max_length=100)
+    document = models.FileField(upload_to='Minuta/', blank=True, null=True)
     publish_date = models.DateTimeField(default=timezone.now)
     status = models.CharField(
         max_length=2,
@@ -73,3 +74,4 @@ class RefuseMinute(models.Model):
 
     def __str__(self):
         return "El miembro %s %s rechazó la minuta %s por: %s" % (self.userprofile.user.first_name, self.userprofile.user.last_name, self.minute.thematic, self.description)
+

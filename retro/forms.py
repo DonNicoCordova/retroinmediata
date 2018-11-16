@@ -17,6 +17,7 @@ class PostForms(forms.ModelForm):
                    'description': forms.Textarea(attrs={'class': 'form-control'})}
         fields = ('title', 'description')
 
+
 class post_form(forms.ModelForm):
     class Meta:
         model = Comment

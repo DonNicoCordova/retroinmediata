@@ -1,3 +1,4 @@
+
 {% load static %}
 <!DOCTYPE html>
 <html><head>
@@ -19,12 +20,6 @@
 
     <link href="{% static 'css/animate.css' %}" rel="stylesheet">
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
-    <link href="{% static 'css/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet">
-    <link href="{% static 'css/plugins/chosen/bootstrap-chosen.css' %}" rel="stylesheet">
-    <link href="{% static 'css/ios.css' %}" rel="stylesheet">
-    <link href="{% static 'css/styles.css' %}" rel="stylesheet">
-    <link href="{% static 'css/plugins/jasny/jasny-bootstrap.min.css' %}" rel="stylesheet">
-    <link href="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.css" rel="stylesheet">
 
 <style type="text/css">.jqstooltip { position: absolute;left: 0px;top: 0px;visibility: hidden;background: rgb(0, 0, 0) transparent;background-color: rgba(0,0,0,0.6);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";color: white;font: 10px arial, san serif;
   text-align: left;white-space: nowrap;padding: 5px;border: 1px solid white;z-index:10000;}.jqsfield { color: white;font: 10px arial, san serif;text-align: left;}
@@ -200,82 +195,34 @@
         <div class="row">
             <div class="col-lg-12">
                 <div class="wrapper wrapper-content">
-                        <div class="row" >
+                        <div class="row" align="center">
 
                             <div class="col-lg-4" style="width: 100%;">
                                 <div class="ibox float-e-margins">
-                                    <div class="ibox-title" style="width: 100%;height: 100px;">
-                                        <small class="pull-left">Ayer 5:20 pm - 12.06.2018</small>
+                                    <div class="ibox-title" style="width: 100%;height: 40px;">
+                                      <h5 style="padding-left: 20px;">Sección {{ SectionNRC }} - Hilos de Discusión</h5>
+                                      <button id="orderbtn" type="button" class="btn btn-outline btn-xs btn-primary pull-right" value="None" onclick="orderThreads()">Ordenar por Calificación</button>
                                         <br>
-
-                                        <div class="ibox-tools">
-                                            <span class="label label-warning-light pull-left">{{Comments|length}} Respuestas</span><h5 style="padding-left: 20px;">Pregunta: ¿Qué contenidos entran en la solemne Nº2?</h5><a href="profile.html" class="pull-right">
-                                                        <img alt="image" class="img-circle" src="{% static 'img/a5.jpg' %}" style="width: 38px;height: 38px;">
-                                                    </a><small class="pull-right"> <b>Francisca Ramirez</b></small>
-                                           </div>
                                     </div>
                                     <div class="ibox-content">
-                                        <div class="row">
-                                            <div id="feedAnswers" class="feed-activity-list">
-                                                {% for x,y in Comments %}
-                                                <div class="feed-element" align="left">
-                                                    <div class="row">
-                                                        <div class="col-lg-12 col-md-12 col-sm-12">
-                                                            <small class="pull-left">{{x.publish_date}}</small>
-                                                            <a href="profile.html" class="pull-right">
-                                                                <img alt="image" class="img-circle" src="{% static 'img/a1.jpg' %}">
-                                                            </a>
-                                                            <div class="media-body ">
-                                                                <small class="pull-right" style=""> <b>{{x.author.user.first_name}} {{x.author.user.last_name}}</b></small><br>
-                                                                <div class="well">{{x.description|safe}}</div>
-                                                            </div>
-                                                        </div>
-                                                        <div class="col-lg-12 col-md-12 col-sm-12">
-                                                            <div class="row">
-                                                                <div class="col-md-6 col-lg-6">
-                                                                    <button id="ratingNumber_{{forloop.counter}}" class="ratingNumber" onclick="rateAnswer(this.id,'ratingStars_{{forloop.counter}}')" style="display: inline;"><b id="ratingNumberTxt__{{forloop.counter}}" style="font-size: 18px; color: gold;">☆ {{y}}</b></button>
-                                                                    <small id="ratingStars_{{forloop.counter}}" class="rating" style="display: none; font-size: 150%;">
-                                                                      <span id="rating5_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
-                                                                      <span id="rating4_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
-                                                                      <span id="rating3_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
-                                                                      <span id="rating2_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
-                                                                      <span id="rating1_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
-                                                                    </small>
-                                                                </div>
-                                                                <div class="col-md-offset-3 col-md-3 col-lg-3 ">
-                                                                    <a class="btn btn-sm btn-warning pull-right">Editar</a>
-                                                                    <a class="btn btn-sm btn-danger pull-right eliminar" data-pk="{{x.pk}}" >Eliminar</a>
-                                                                </div>
-                                                            </div>
-                                                        </div>
+                                            <div id="feedThreads" class="feed-activity-list">
+                                                {% for x,y in Threads %}
+                                                <div id="Thread_{{x.pk}}" class="feed-element" align="left">
+                                                  <small class="pull-left">{{x.publish_date}}</small>
+                                                    <div class="media-body ">
+                                                        <h3 style="padding-left: 20px;">{{x.name}}</h3>
                                                     </div>
-
+                                                    <button id="ratingNumber_{{forloop.counter}}" class="ratingNumber" onclick="rateThread(this.id,'ratingStars_{{forloop.counter}}')" style="display: inline;"><b id="ratingNumberTxt__{{forloop.counter}}" style="font-size: 18px; color: gold;">☆ {{y}}</b></button>
+                                                    <small id="ratingStars_{{forloop.counter}}" class="rating" style="display: none; font-size: 150%;">
+                                                      <span id="rating5_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                                                      <span id="rating4_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                                                      <span id="rating3_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                                                      <span id="rating2_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                                                      <span id="rating1_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                                                    </small>
                                                 </div>
                                                 {% endfor %}
                                             </div>
-                                            <div class="col-lg-12 col-sm-12" style="padding-top:2%">
-                                                <form id="formComment" method="POST" action="{% url 'comment_post' %}" enctype="multipart/form-data">
-                                                    {% csrf_token %}
-                                                    <input type="text" value="{{Postpk}}" name="Postpk" hidden>
-                                                    <div class="form-group"><label>Comentar:</label> <input placeholder="Escriba su comentario"  class="form-control summernote" type="text" id="summernote"></div>
-                                                    <div class="fileinput fileinput-new input-group" data-provides="fileinput">
-                                                        <div class="form-control" data-trigger="fileinput">
-                                                            <i class="glyphicon glyphicon-file fileinput-exists"></i>
-                                                        <span class="fileinput-filename"></span>
-                                                        </div>
-                                                        <span class="input-group-addon btn btn-default btn-file">
-                                                            <span class="fileinput-new">Adjuntar Archivo</span>
-                                                            <span class="fileinput-exists">Cambiar</span>
-                                                            <input type="file" id="saved_file" name="saved_file"/>
-                                                        </span>
-                                                        <a href="#" class="input-group-addon btn btn-default fileinput-exists" data-dismiss="fileinput">Eliminar</a>
-                                                    </div> 
-                                                    <div class="pull-right">
-                                                        <button class="btn btn-warning btn-sm" type="submit"><i class="fa fa-pencil"></i> Comentar</button>
-                                                    </div>
-                                                </form>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -298,9 +245,7 @@
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/plugins/metisMenu/jquery.metisMenu.js' %}"></script>
     <script src="{% static 'js/plugins/slimscroll/jquery.slimscroll.min.js' %}"></script>
-    <script src="{% static 'js/plugins/jasny/jasny-bootstrap.min.js' %}"></script>
-    <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js"></script>
-    
+
     <!-- Flot -->
     <script src="{% static 'js/plugins/flot/jquery.flot.js' %}"></script>
     <script src="{% static 'js/plugins/flot/jquery.flot.tooltip.min.js' %}"></script>
@@ -335,64 +280,66 @@
                     timeOut: 4000
                 };
                 toastr.success('Bienvenido Juan Jose', 'RI UNAB');
-
             }, 1300);
-            $('.summernote').summernote({
-                toolbar: false,
-                height: 100,
-            });
-            function upload(event) {
-                event.preventDefault();
-                var data = new FormData($('form').get(0));
-                data.append('content',$('#summernote').summernote('code')); 
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: $(this).attr('method'),
-                    data: data,
-                    cache: false,
-                    processData: false,
-                    contentType: false,
-                    success: function(data) {
-                        $('#summernote').summernote('reset');
-                        $("#saved_file").val("");
-                        if (data.message == "ok"){
-                            location.reload();
-                        }
-                    }
-                });
-                return false;
-            }
-            $(function() {
-                $('form').submit(upload);
-                
-            });
-            $(".eliminar").click(function(){
-                console.log("click")
-                var pk = $(this).data("pk");
-                data = {
-                    csrfmiddlewaretoken: "{{csrf_token}}",
-                    pk: pk,
-                }
-                console.log(data);
-                $.ajax({
-                    url:'{% url "delete_comment" %}',
-                    type: "POST",
-                    data: data,
-                    cache: false,
-                    processData: false,
-                    contentType: false,
-                    success: function(data) {
-                        if (data.message == "ok"){
-                            location.reload();
-                        }
-                    }
-                });
-            });
         });
     </script>
 
+    <script>
+    	function orderThreads() {
+    	   var btn = document.getElementById("orderbtn");
+         var sortOrder = ""
+         if (btn.value == "None") {
+           btn.value = "Ascending"
+           btn.innerText = "Menor a mayor calificado ▲"
+           btn.classList.add("btn-primary");
+           sortOrder = "Ascending"
+         }else if (btn.value == "Ascending") {
+           btn.value = "Descending"
+           btn.innerText = "Mayor a menor calificado ▼"
+           sortOrder = "Descending"
+         }else if (btn.value == "Descending") {
+           btn.value = "Ascending"
+           btn.innerText = "Menor a mayor calificado ▲"
+           sortOrder = "Ascending"
+         }
+         $.ajax({
+           url : "{% url 'forum' %}",
+           type : "POST",
+           data : {
+             rtype : 'sort',
+             order : sortOrder,
+             csrfmiddlewaretoken : getCookie('csrftoken'),
+           },
+           success : function(data){
+             var threadFeed = document.getElementById("feedThreads");
+             for (x in data){
+              var thread = document.getElementById("Thread_"+x);
+              if(thread != null){
+                threadFeed.removeChild(thread);
+              }
+            threadFeed.innerHTML+=
+            '<div id="Thread_'+data[x]['pk']+'" class="feed-element" align="left">'+
+              '<small class="pull-left">'+data[x]['publish_date']+'</small>'+
+                '<div class="media-body ">'+
+                    '<h3 style="padding-left: 20px;">'+data[x]['name']+'</h3>'+
+                '</div>'+
+                '<button id="ratingNumber_'+x+'" class="ratingNumber"'+'onclick="rateThread(this.id,&#39ratingStars_'+x+'&#39)"style="display: inline;"><b id="ratingNumberTxt_'+x+'" style="font-size: 18px; color: gold;">☆ '+data[x]['rating']+'</b></button>'+
+                '<small id="ratingStars_'+x+'" class="rating" style="display: none; font-size: 150%;">'+
+                  '<span id="rating5_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                  '<span id="rating4_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                  '<span id="rating3_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                  '<span id="rating2_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                  '<span id="rating1_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                '</small>'+
+            '</div>';
+            }
+           },
+         });
+    	}
+  	</script>
+
 	<script>
-  	function rateAnswer(idRatingNumber,idRatingStar) {
+  	function rateThread(idRatingNumber,idRatingStar) {
   	   var x = document.getElementById(idRatingNumber);
        var y = document.getElementById(idRatingStar);
        if (y.style.display === "none") {
@@ -412,7 +359,6 @@
             var cookies = document.cookie.split(';');
             for(var i = 0; i < cookies.length; i++){
                 var cookie = jQuery.trim(cookies[i]);
-
                 if(cookie.substring(0,name.length + 1) == (name + '=')){
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                     break;
@@ -421,36 +367,30 @@
         }
         return cookieValue
     }
-
 	</script>
 
 	<script>
-  	function postRating(commentPk,idRatingNumber,idRatingStar,idRatingNumberTxt,idStar) {
+  	function postRating(threadPk,idRatingNumber,idRatingStar,idRatingNumberTxt,idStar) {
       var x = document.getElementById(idRatingNumber);
       var y = document.getElementById(idRatingStar);
   	  var z = document.getElementById(idRatingNumberTxt);
       if (x.style.display === "none") {
-          //window.alert(comment.description)
           var ratingUser = idStar.replace("rating", "").split("_")[0];
-
           $.ajax({
-            url : "{% url 'question' %}",
+            url : "{% url 'forum' %}",
             type : "POST",
             data : {
+              rtype : 'rate',
               rating : ratingUser,
-              comment : commentPk,
+              thread : threadPk,
               csrfmiddlewaretoken : getCookie('csrftoken'),
             },
             success : function(data){
-              z.innerHTML = '☆ ' + data[commentPk];
+              z.innerHTML = '☆ ' + data[threadPk];
               x.style.display = "inline";
               y.style.display = "none";
-              //console.log(data);
-              //console.log(commentPk);
-              //console.log(data[commentPk]);
             },
           });
-
       } else {
           x.style.display = "none";
   		    y.style.display = "inline";

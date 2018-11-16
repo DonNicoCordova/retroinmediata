@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Subject, Section, Post, Comment, Threshold, UserType, Career, CareerSubjectSection, Student, Thread, ThreadRanking, ThreadFollower, PostFollower, PostRanking, CommentArchive, CommentRanking
+from .models import Subject, Section, Post, Comment, Threshold, Career, CareerSubjectSection, Student, Thread, ThreadRanking, ThreadFollower, PostFollower, PostRanking, CommentArchive, CommentRanking
 
 
 admin.site.register(Section)
@@ -7,7 +7,6 @@ admin.site.register(Post)
 admin.site.register(Subject)
 admin.site.register(Comment)
 admin.site.register(Threshold)
-admin.site.register(UserType)
 admin.site.register(Career)
 admin.site.register(CareerSubjectSection)
 admin.site.register(Student)
