@@ -12,6 +12,9 @@ def minutas(request):
     data = {}
     data["object_all"] = minuta
     data["form"] = RefuseMinutes()
+    userprofiles = UserProfile.objects.get(user = request.user)
+    if userprofiles.student == True:
+        redirect('minutas')
     if request.method == "POST":
         data['form'] = RefuseMinutes(request.POST)
 
@@ -22,14 +25,10 @@ def minutas(request):
 
             obj = data['form'].save(commit = False)
             obj.minute = minuta
-            userprofiles = UserProfile.objects.get(user = request.user)
             obj.userprofile = userprofiles
             obj.save()
-
-            return JsonResponse({'message': 'ok'})
-
+            
     else:
-        print("holi")
         template = "minutas/listar_minutas.html"
         return render(request, template, data)
     template = "minutas/listar_minutas.html"
