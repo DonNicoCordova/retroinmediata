@@ -1,22 +1,67 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 {% load static %}
-{% block title %}
-Editar Minuta
 
-{% endblock %}
+{% block stylesheet %}
 
-{% block content %}
+<link href="{% static 'css/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/chosen/bootstrap-chosen.css' %}" rel="stylesheet">
+<link href="{% static 'css/ios.css' %}" rel="stylesheet">
+<link href="{% static 'css/styles.css' %}" rel="stylesheet">
 
-<div class="row">
-    <div class="col-sm-12 col-md-12 col-lg-12 col-xl-12">
-        <h1 class = 'text-center' style="margin-top:30px;">{{tittle}}</h1>
-        <form action="" method="POST" enctype="multipart/form-data">{% csrf_token %}
-            {{ data.as_p }}
-            <input type="submit" value="Enviar" class="btn btn-primary btn-lg btn-block">
-        </form>
-        <br>
+{% endblock stylesheet %}
+
+
+{% block breadcrumb %}
+<div class="row wrapper border-bottom white-bg page-heading" style="padding-bottom: 0px;">
+    <div class="col-lg-10">
+        <h2>Crear Minuta</h2>
+    </div>
+    <div class="col-lg-2">
+
     </div>
 </div>
+{% endblock breadcrumb %}
+{% block content %}
+
+<form action="" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-group">
+            <label>Tematica</label>
+            <div class="input-group">
+                {{form.thematic}}
+            </div>
+            {{form.thematic.errors}}
+        </div>
+        <div class="form-group">
+            <label>Direccion</label>
+            <div class="input-group">
+                {{form.address}}
+            </div>
+            {{form.address.errors}}
+        </div>
+        <div class="form-group">
+            <label>Documento</label>
+            <div class="input-group">
+                {{form.document}}
+            </div>
+            {{form.document.errors}}
+        </div>
+
+        
+        <button type="submit" class="btn btn-primary btn-block py-2">Editar Minuta</button>
+
+    </form>
+
 
 {% endblock content %}
 
+
+{% block javascript %}
+<script src="{% static 'js/plugins/chosen/chosen.jquery.js' %}"></script>
+
+<script>
+    
+</script>
+
+
+{% endblock javascript %}

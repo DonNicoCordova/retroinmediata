@@ -47,17 +47,18 @@
                         <i class="fa fa-bell"></i>  <span class="label label-primary" >jhghg</span>
                     </a>
                     <ul class="dropdown-menu dropdown-alerts">
+                        {% for i in AlertMinute %}
                         <li>
                             <a href="#">
                                 <div>
-                                {% for i in minuta %}
                                     <i class="fa fa-envelope fa-fw"></i>
                                     <span class="text-muted ">{{i}}</span>
                                     <span class="pull-right text-muted small">4 minutes ago</span>
-                                {% endfor %}
+                                
                                 </div>
                             </a>
                         </li>
+                        {% endfor %}
                         <li class="divider"></li>
                         <a id="borrar"><strong class="center-text">Borrar Notificaciones</strong></a>
                     </ul>

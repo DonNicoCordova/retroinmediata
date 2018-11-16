@@ -26,27 +26,34 @@ def minutas(request):
             obj.userprofile = userprofiles
             obj.save()
 
-            return JsonResponse({'message': 'ok'})
+            #return JsonResponse({'message': 'ok'})
 
     else:
-        print("holi")
+        data['AlertMinute'] = AlertMinute.objects.all()
+        print(data['AlertMinute'])
         template = "minutas/listar_minutas.html"
         return render(request, template, data)
     template = "minutas/listar_minutas.html"
+      
     return render(request, template, data)
 
-def edit_minute(request, minute_id):
+def edit_minute(request, pk):
     data = {}
-    data["type"] = 1 
-    data["request"] = 'POST' 
+    data["type"] = 1
     if request.POST:
-        formMinute = Minute(request.POST, request.FILES, instance=Minute.objects.get(pk=minute_id))
+        formMinute = MinutasForm(request.POST, request.FILES, instance=Minute.objects.get(pk=pk))
         if formMinute.is_valid():
-            formMinute.save()
-            return redirect('edit_minuta')
-    template_name = 'minutas/edit_minuta.html'
-    data['data'] = Minute(instance=Minute.objects.get(pk=minute_id))
-
+            minuta_editada = formMinute.save()
+            profile = UserProfile.objects.get(user=request.user)
+            new_member = Member(userprofile = profile, minute=minuta_editada)
+            new_member.save()
+            participantes = minuta_editada.member_set.all().values_list('userprofile', flat=True)
+            for x in participantes:
+                    AlertMinute.objects.create(minutes=minuta_editada, user_id=x)
+            return redirect('minutas')
+    else:
+        data['form'] = MinutasForm(instance=Minute.objects.get(pk=pk))
+    template_name = 'minutas/edit_minuta.html'  
     return render(request, template_name, data)
 
 def crear_minuta(request):

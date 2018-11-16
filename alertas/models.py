@@ -45,3 +45,6 @@ class AlertMinute(models.Model):
     user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
     publish_date = models.DateTimeField(default=timezone.now)
     status = models.BooleanField(default=True)
+
+    def __str__(self):
+        return 'El usuario %s modifico la minuta %s ' % (self.user ,self.minutes.thematic)
