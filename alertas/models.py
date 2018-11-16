@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 from retro_auth.models import UserProfile
 from retro.models import Post
-
+from minutas.models import *
 # Create your models here.
 
 
@@ -38,3 +38,11 @@ class Alerta(models.Model):
     def __str__(self):
     #Arreglamos esta funcion para que aparezca el nombre y el rut del usuario BIEN
         return 'El usuario %s respondio a %s (que hizo la pregunta)' % (self.user_ans.user,self.user_ask.user )
+
+class AlertMinute(models.Model):
+    minutes = models.ForeignKey(Minute, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    publish_date = models.DateTimeField(default=timezone.now)
+    status = models.BooleanField(default=True)
+    def __str__(self):
+        return 'El usuario %s modifico la minuta %s ' % (self.user ,self.minutes.thematic)
