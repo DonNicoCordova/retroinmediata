@@ -13,8 +13,6 @@ def minutas(request):
     data["form"] = RefuseMinutes()
     if request.method == "POST":
         data['form'] = RefuseMinutes(request.POST)
-
-
         if data['form'].is_valid():
             # aca el formulario valido
             minuta = Minute.objects.get(pk=request.POST["pk"])
@@ -24,11 +22,9 @@ def minutas(request):
             userprofiles = UserProfile.objects.get(user = request.user)
             obj.userprofile = userprofiles
             obj.save()
-
             return JsonResponse({'message': 'ok'})
 
     else:
-        print("holi")
         template = "minutas/listar_minutas.html"
         return render(request, template, data)
     template = "minutas/listar_minutas.html"

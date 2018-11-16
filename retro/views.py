@@ -202,8 +202,6 @@ def post_details(request, pk):
         post = Post.objects.get(pk=pk)
         all_comment = Comment.objects.filter(post=post)
         listComments = []
-
-
         for i in all_comment:
             rankingSum = 0
             rankingAvg = 0.0
@@ -308,6 +306,7 @@ def question(request):
         listComments.append(tuple((i, round(rankingAvg, 1))))
 
     if request.POST:
+        print(request.POST)
         if request.POST['rtype']=='sort':
             sortedList = []
             if request.POST['order']=='Ascending':

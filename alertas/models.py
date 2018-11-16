@@ -35,6 +35,6 @@ class Alerta(models.Model):
     #hilo = funcion(retorna si es hilo True, si no False )
 
 
-    def __str__(self):
-    #Arreglamos esta funcion para que aparezca el nombre y el rut del usuario BIEN
-        return 'El usuario %s respondio a %s (que hizo la pregunta)' % (self.user_ans.user,self.user_ask.user )
+    # def __str__(self):
+    # #Arreglamos esta funcion para que aparezca el nombre y el rut del usuario BIEN
+    #     return 'El usuario %s respondio a %s (que hizo la pregunta)' % (self.user_ans.user,self.user_ask.user )
