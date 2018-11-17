@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from retro.models import CommentRanking, ThreadRanking, ThreadFollower
+from retro.models import CommentRanking, ThreadRanking, ThreadFollower, PostFollower
 from django.db.models import Q
 from retro_auth.models import UserProfile
 from retro.forms import post_form, post_form_document
@@ -148,7 +148,7 @@ def section_details(request, pk):
             data['threadpage'] = paginator.page(1)
         except EmptyPage:
             data['threadpage'] = paginator.page(paginator.num_pages)
-        data['follow'] = ThreadFollower.objects.filter(thread__in=data['threadpage']).values_list('thread', flat=True)
+        data['follow'] = ThreadFollower.objects.filter(thread__in=data['threadpage']).values_list('thread_id', flat=True)
     else:
         messages.error(request, 'No existe la sección.')
         return HttpResponseRedirect(reverse('index'))
@@ -165,23 +165,31 @@ def thread_details(request, pk):
         data['formvalid'] = True
         data['postparecido']=0
         if request.POST:
-            data['postform'] = PostForms(request.POST)
-            if data['postform'].is_valid():
-                a = coincidencia(request.POST["title"],thread)
-                print(a)
-                if a[0] == True:
-                    frase = ' '.join(a[1])
-                    data['postparecido']=1
-                    data['postfrase'] = frase
+            if request.POST['action'] == 'createPost':
+                data['postform'] = PostForms(request.POST)
+                if data['postform'].is_valid():
+                    a = coincidencia(request.POST["title"],thread)
+                    print(a)
+                    if a[0] == True:
+                        frase = ' '.join(a[1])
+                        data['postparecido']=1
+                        data['postfrase'] = frase
+                    else:
+                        data['postform'] = data['postform'].save(commit=False)
+                        data['postform'].author = request.user.userprofile
+                        data['postform'].thread = thread
+                        data['postform'].save()
+                        return HttpResponseRedirect(reverse('thread_details', kwargs={'pk': pk}))
                 else:
-                    data['postform'] = data['postform'].save(commit=False)
-                    data['postform'].author = request.user.userprofile
-                    data['postform'].thread = thread
-                    data['postform'].save()
-                    return HttpResponseRedirect(reverse('thread_details', kwargs={'pk': pk}))
-            else:
-                if a[0] != True:
-                    data['formvalid'] = False
+                    if a[0] != True:
+                        data['formvalid'] = False
+            elif request.POST['action'] == 'followPost':
+                follow = PostFollower.objects.filter(userprofile=request.user.userprofile, post_id=request.POST['pk'])
+                if follow:
+                    follow[0].delete()
+                else:
+                    PostFollower.objects.create(userprofile=request.user.userprofile, post_id=request.POST['pk'])
+                return JsonResponse({})
         data['thread'] = thread
         page = request.GET.get('page')
         search = request.GET.get('search')
@@ -198,6 +206,7 @@ def thread_details(request, pk):
             data['postlist'] = paginator.page(1)
         except EmptyPage:
             data['postlist'] = paginator.page(paginator.num_pages)
+        data['follow'] = PostFollower.objects.filter(post__in=data['postlist']).values_list('post_id', flat=True)
     else:
         messages.error(request, 'No existe el hilo.')
         return HttpResponseRedirect(reverse('index'))

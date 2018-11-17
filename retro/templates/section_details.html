@@ -175,7 +175,7 @@
                                 <i class="fa fa-clock-o"></i> <a href="#">{% with x.getDiference as difference %} {{ difference }} {% if difference == 1 %}Hora{% else %}Horas{% endif %} atrás {% endwith %}</a>
                                 <span class="seguirHilo">
                                   {% if x.pk in follow %}
-                                  <i class="fa fa-arrow-right"></i> <a href="#">Seguir hilo</a>
+                                  <i class="fa fa-arrow-right"></i> <a href="#">Seguir el hilo</a>
                                   {% else %}
                                     <i class="fa fa-times"></i> <a href="#">Dejar de seguir el hilo</a>
                                   {% endif %}
@@ -316,7 +316,7 @@
               span.find('a').text('Degar de seguir el hilo');
             }else{
               i.removeClass('fa-times').addClass('fa-arrow-right');
-              span.find('a').text('Seguir el Hilo');
+              span.find('a').text('Seguir el hilo');
             }
           }
         });
