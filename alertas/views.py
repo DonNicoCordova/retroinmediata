@@ -9,6 +9,7 @@ from django.contrib import messages
 from django.shortcuts import render
 from .models import*
 from django.http import JsonResponse
+from datetime import datetime,timedelta
 
 
 # Create your views here.
@@ -102,3 +103,26 @@ def alerta(request):
         data['form2'] = Alerta2Form()
     template_name = 'alertas.html'
     return render(request, template_name, data)
+
+
+#funcion que indica al profesor que:
+#1.)su umbral de tiempo de respuesta en un determinado post está a punto de vencer
+#2.)su umbral de tiempo de respuesta en un determinado post ya venció
+def notification_umbral_limit(request):
+	TEMPLATE_NAME = "base.html"
+	connected_user = UserProfile.objects.get(user=request.user) #Usuario conectado a la base de datos
+	umbral = connected_user.umbral
+	if(connected_user.is_teacher == True):
+		list_no_comment = []
+		list_to_comment = []
+		listapost = Post.objects.filter(thread__section__teacher=connected_user, publish_date__lt=datetime.now() - timedelta(days=umbral))
+		for x in listapost:
+			if (not x.comment_set.filter(author=connected_user).exists()):
+				list_no_comment.append(x)
+		umbral = umbral-1
+		listapost2= Post.objects.filter(thread__section__teacher=connected_user, publish_date__lt=datetime.now() - timedelta(days=umbral))
+		for x in listapost2:
+			if (not x.comment_set.filter(author=connected_user).exists()):
+				list_to_comment.append(x)
+
+	return render(request,TEMPLATE_NAME,{"list_no_comment":list_no_comment},{"list_to_comment":list_to_comment})
