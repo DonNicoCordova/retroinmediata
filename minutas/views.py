@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from alertas.models import *
 from retro.views import *
 from django.core.exceptions import ValidationError
-
+from alertas.models import AlertMinute
 # Create your views here.
 
 def minutas(request):
@@ -15,6 +15,9 @@ def minutas(request):
     data = {}
     data["object_all"] = minuta
     data["form"] = RefuseMinutes()
+    userprofiles = UserProfile.objects.get(user = request.user)
+    if userprofiles.student == True:
+        redirect('minutas')
     if request.method == "POST":
         data['form'] = RefuseMinutes(request.POST)
 
@@ -25,17 +28,15 @@ def minutas(request):
 
             obj = data['form'].save(commit = False)
             obj.minute = minuta
-            userprofiles = UserProfile.objects.get(user = request.user)
             obj.userprofile = userprofiles
             obj.save()
-
-            return JsonResponse({'message': 'ok'})
-
     else:
-        print("holi")
+        data['AlertMinute'] = AlertMinute.objects.all()
+        print(data['AlertMinute'])
         template = "minutas/listar_minutas.html"
         return render(request, template, data)
     template = "minutas/listar_minutas.html"
+
     return render(request, template, data)
 
 def edit_minute(request, pk):
@@ -46,7 +47,6 @@ def edit_minute(request, pk):
         if formMinute.is_valid():
             minuta_editada = formMinute.save()
             profile = UserProfile.objects.get(user=request.user)
-            Member.objects.create(userprofile = profile, minute=minuta_editada)
             new_member = Member(userprofile = profile, minute=minuta_editada)
             new_member.save()
             participantes = minuta_editada.member_set.all().values_list('userprofile', flat=True)
@@ -55,8 +55,7 @@ def edit_minute(request, pk):
             return redirect('minutas')
     else:
         data['form'] = MinutasForm(instance=Minute.objects.get(pk=pk))
-    template_name = 'minutas/edit_minute.html'
-
+    template_name = 'minutas/edit_minuta.html'
     return render(request, template_name, data)
 
 def crear_minuta(request):
@@ -78,5 +77,4 @@ def crear_minuta(request):
             return redirect(reverse('crear_minuta')+"?ok")
     else:
         form = MinutasForm()
-
     return render(request, "minutas/_minutas.html", {'form':form, 'minuta': Minute.objects.all(), 'alertas': AlertMinute.objects.filter(user=request.user.userprofile)})

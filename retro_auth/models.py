@@ -13,6 +13,6 @@ class UserProfile(models.Model):
     is_sacademic = models.BooleanField(default=False)
     is_dcareer = models.BooleanField(default=False)
     umbral = models.PositiveIntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(15)])
-
+    
     def __str__(self):
         return "%s Rut: %s Umbral: %s" % (self.user, self.rut, self.umbral)
