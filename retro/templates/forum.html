@@ -1,291 +1,97 @@
-
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html><head>
+{% load retroTags %}
+{% block stylesheet %}
 
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+<link href="{% static 'css/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/chosen/bootstrap-chosen.css' %}" rel="stylesheet">
+<link href="{% static 'css/ios.css' %}" rel="stylesheet">
+<link href="{% static 'css/styles.css' %}" rel="stylesheet">
+  <style>
+    .modal {
+    text-align: center;
+    padding: 0!important;
+  }
 
-    <title>UNAB | Foro</title>
+  .modal:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+    margin-right: -4px;
+  }
 
-    <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-    <link href="{% static 'font-awesome/css/font-awesome.css' %}" rel="stylesheet">
+  .modal-dialog {
+    display: inline-block;
+    text-align: left;
+    vertical-align: middle;
+  }
+  </style>
+{% endblock stylesheet %}
 
-    <!-- Toastr style -->
-    <link href="{% static 'css/plugins/toastr/toastr.min.css' %}" rel="stylesheet">
 
-    <!-- Gritter -->
-    <link href="{% static 'js/plugins/gritter/jquery.gritter.css' %}" rel="stylesheet">
-
-    <link href="{% static 'css/animate.css' %}" rel="stylesheet">
-    <link href="{% static 'css/style.css' %}" rel="stylesheet">
-
-<style type="text/css">.jqstooltip { position: absolute;left: 0px;top: 0px;visibility: hidden;background: rgb(0, 0, 0) transparent;background-color: rgba(0,0,0,0.6);filter:progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000);-ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#99000000, endColorstr=#99000000)";color: white;font: 10px arial, san serif;
-  text-align: left;white-space: nowrap;padding: 5px;border: 1px solid white;z-index:10000;}.jqsfield { color: white;font: 10px arial, san serif;text-align: left;}
-</style>
-</head>
-
-<body class="pace-done"><div class="pace  pace-inactive"><div class="pace-progress" style="transform: translate3d(100%, 0px, 0px);" data-progress-text="100%" data-progress="99">
-  <div class="pace-progress-inner"></div>
+{% block breadcrumb %}
+<div class="ibox-title" style="width: 100%;height: 40px;">
+  <h5 style="padding-left: 20px;">Sección {{ SectionNRC }} - Hilos de Discusión</h5>
+  <button id="orderbtn" type="button" class="btn btn-outline btn-xs btn-primary pull-right" value="None" onclick="orderThreads()">Ordenar por Calificación</button>
+    <br>
 </div>
-<div class="pace-activity"></div></div>
+{% endblock breadcrumb %}
 
-    <div id="wrapper">
-        <nav class="navbar-default navbar-static-side" role="navigation">
-            <div class="sidebar-collapse">
-                <ul class="nav metismenu" id="side-menu">
-                    <li class="nav-header">
-                        <div class="dropdown profile-element"> <span>
-                            <img alt="image" class="img-circle" src="{% static 'img/profile_small.jpg' %}">
-                             </span>
-                            <a data-toggle="dropdown" class="dropdown-toggle" href="#">
-                            <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold">Juan Jose de Comba</strong>
-                             </span> <span class="text-muted text-xs block">Alumno <b class="caret"></b></span> </span> </a>
-                            <ul class="dropdown-menu animated fadeInRight m-t-xs">
-                                <li><a href="profile.html">Profile</a></li>
-                                <li><a href="contacts.html">Contacts</a></li>
-                                <li><a href="mailbox.html">Mailbox</a></li>
-                                <li class="divider"></li>
-                                <li><a href="login.html">Logout</a></li>
-                            </ul>
+{% block content %}
+<div class="col-lg-4" style="width: 100%;">
+    <div class="ibox float-e-margins">
+
+        <div class="ibox-content">
+                <div id="feedThreads" class="feed-activity-list">
+                    {% for x,y in Threads %}
+                    <div id="Thread_{{x.pk}}" class="feed-element" align="left">
+                      <small class="pull-left">{{x.publish_date}}</small>
+                        <div class="media-body ">
+                            <a class="vote-title" href="{% url 'thread_details' x.pk %}" style="padding-left: 20px;">{{x.name}}</a>
                         </div>
-                        <div class="logo-element">
-                            IN+
-                        </div>
-                    </li>
-                    <li class="active">
-                        <a href="index.html"><i class="fa fa-th-large"></i> <span class="nav-label">Curso</span> <span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level collapse in">
-                            <li class="active"><a href="index.html">Foro</a></li>
-                        </ul>
-                    </li>
-                </ul>
-
-            </div>
-        </nav>
-
-        <div id="page-wrapper" class="gray-bg dashbard-1">
-        <div class="row border-bottom">
-        <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
-        <div class="navbar-header">
-            <a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i class="fa fa-bars"></i> </a>
-            <form role="search" class="navbar-form-custom" action="search_results.html">
-                <div class="form-group">
-                    <input type="text" placeholder="Search for something..." class="form-control" name="top-search" id="top-search">
-                </div>
-            </form>
-        </div>
-            <ul class="nav navbar-top-links navbar-right">
-                <li>
-                    <span class="m-r-sm text-muted welcome-message">Bienvenido a RI UNAB.</span>
-                </li>
-                <li class="dropdown">
-                    <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#" aria-expanded="false">
-                        <i class="fa fa-envelope"></i>  <span class="label label-warning">16</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-messages">
-                        <li>
-                            <div class="dropdown-messages-box">
-                                <a href="profile.html" class="pull-left">
-                                    <img alt="image" class="img-circle" src="{% static 'img/a7.jpg' %}">
-                                </a>
-                                <div class="media-body">
-                                    <small class="pull-right">46h ago</small>
-                                    <strong>Mike Loreipsum</strong> started following <strong>Monica Smith</strong>. <br>
-                                    <small class="text-muted">3 days ago at 7:58 pm - 10.06.2014</small>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <div class="dropdown-messages-box">
-                                <a href="profile.html" class="pull-left">
-                                    <img alt="image" class="img-circle" src="{% static 'img/a4.jpg' %}">
-                                </a>
-                                <div class="media-body ">
-                                    <small class="pull-right text-navy">5h ago</small>
-                                    <strong>Chris Johnatan Overtunk</strong> started following <strong>Monica Smith</strong>. <br>
-                                    <small class="text-muted">Yesterday 1:21 pm - 11.06.2014</small>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <div class="dropdown-messages-box">
-                                <a href="profile.html" class="pull-left">
-                                    <img alt="image" class="img-circle" src="{% static 'img/profile.jpg' %}">
-                                </a>
-                                <div class="media-body ">
-                                    <small class="pull-right">23h ago</small>
-                                    <strong>Monica Smith</strong> love <strong>Kim Smith</strong>. <br>
-                                    <small class="text-muted">2 days ago at 2:30 am - 11.06.2014</small>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <div class="text-center link-block">
-                                <a href="mailbox.html">
-                                    <i class="fa fa-envelope"></i> <strong>Read All Messages</strong>
-                                </a>
-                            </div>
-                        </li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#" aria-expanded="false">
-                        <i class="fa fa-bell"></i>  <span class="label label-primary">8</span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-alerts">
-                        <li>
-                            <a href="mailbox.html">
-                                <div>
-                                    <i class="fa fa-envelope fa-fw"></i> You have 16 messages
-                                    <span class="pull-right text-muted small">4 minutes ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a href="profile.html">
-                                <div>
-                                    <i class="fa fa-twitter fa-fw"></i> 3 New Followers
-                                    <span class="pull-right text-muted small">12 minutes ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <a href="grid_options.html">
-                                <div>
-                                    <i class="fa fa-upload fa-fw"></i> Server Rebooted
-                                    <span class="pull-right text-muted small">4 minutes ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <li>
-                            <div class="text-center link-block">
-                                <a href="notifications.html">
-                                    <strong>See All Alerts</strong>
-                                    <i class="fa fa-angle-right"></i>
-                                </a>
-                            </div>
-                        </li>
-                    </ul>
-                </li>
-
-
-                <li>
-                    <a href="login.html">
-                        <i class="fa fa-sign-out"></i> Log out
-                    </a>
-                </li>
-                <li>
-                    <a class="right-sidebar-toggle">
-                        <i class="fa fa-tasks"></i>
-                    </a>
-                </li>
-            </ul>
-
-        </nav>
-        </div>
-
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="wrapper wrapper-content">
-                        <div class="row" align="center">
-
-                            <div class="col-lg-4" style="width: 100%;">
-                                <div class="ibox float-e-margins">
-                                    <div class="ibox-title" style="width: 100%;height: 40px;">
-                                      <h5 style="padding-left: 20px;">Sección {{ SectionNRC }} - Hilos de Discusión</h5>
-                                      <button id="orderbtn" type="button" class="btn btn-outline btn-xs btn-primary pull-right" value="None" onclick="orderThreads()">Ordenar por Calificación</button>
-                                        <br>
-                                    </div>
-                                    <div class="ibox-content">
-                                            <div id="feedThreads" class="feed-activity-list">
-                                                {% for x,y in Threads %}
-                                                <div id="Thread_{{x.pk}}" class="feed-element" align="left">
-                                                  <small class="pull-left">{{x.publish_date}}</small>
-                                                    <div class="media-body ">
-                                                        <h3 style="padding-left: 20px;">{{x.name}}</h3>
-                                                    </div>
-                                                    <button id="ratingNumber_{{forloop.counter}}" class="ratingNumber" onclick="rateThread(this.id,'ratingStars_{{forloop.counter}}')" style="display: inline;"><b id="ratingNumberTxt__{{forloop.counter}}" style="font-size: 18px; color: gold;">☆ {{y}}</b></button>
-                                                    <small id="ratingStars_{{forloop.counter}}" class="rating" style="display: none; font-size: 150%;">
-                                                      <span id="rating5_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
-                                                      <span id="rating4_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
-                                                      <span id="rating3_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
-                                                      <span id="rating2_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
-                                                      <span id="rating1_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
-                                                    </small>
-                                                </div>
-                                                {% endfor %}
-                                            </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                </div>
-                <div class="footer">
-                    <div>
-                        <strong>Copyright </strong>ScrumTeam TI Unab © 2018
+                        <button id="ratingNumber_{{forloop.counter}}" class="ratingNumber" onclick="rateThread(this.id,'ratingStars_{{forloop.counter}}')" style="display: inline;"><b id="ratingNumberTxt__{{forloop.counter}}" style="font-size: 18px; color: gold;">☆ {{y}}</b></button>
+                        <small id="ratingStars_{{forloop.counter}}" class="rating" style="display: none; font-size: 150%;">
+                          <span id="rating5_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                          <span id="rating4_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                          <span id="rating3_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                          <span id="rating2_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                          <span id="rating1_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                        </small>
                     </div>
+                    {% endfor %}
                 </div>
-            </div>
         </div>
-
-        </div>
-
     </div>
+</div>
+{% endblock content %}
 
-    <!-- Mainly scripts -->
-    <script src="{% static 'js/jquery-3.1.1.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/plugins/metisMenu/jquery.metisMenu.js' %}"></script>
-    <script src="{% static 'js/plugins/slimscroll/jquery.slimscroll.min.js' %}"></script>
 
-    <!-- Flot -->
-    <script src="{% static 'js/plugins/flot/jquery.flot.js' %}"></script>
-    <script src="{% static 'js/plugins/flot/jquery.flot.tooltip.min.js' %}"></script>
-    <script src="{% static 'js/plugins/flot/jquery.flot.spline.js' %}"></script>
-    <script src="{% static 'js/plugins/flot/jquery.flot.resize.js' %}"></script>
-    <script src="{% static 'js/plugins/flot/jquery.flot.pie.js' %}"></script>
+{% block javascript %}
 
-    <!-- Peity -->
-    <script src="{% static 'js/plugins/peity/jquery.peity.min.js' %}"></script>
-
-    <!-- Custom and plugin javascript -->
-    <script src="{% static 'js/inspinia.js' %}"></script>
-    <script src="{% static 'js/plugins/pace/pace.min.js' %}"></script>
-
-    <!-- jQuery UI -->
-    <script src="{% static 'js/plugins/jquery-ui/jquery-ui.min.js' %}"></script>
-
-    <!-- Jvectormap -->
-    <script src="{% static 'js/plugins/jvectormap/jquery-jvectormap-2.0.2.min.js' %}"></script>
-    <script src="{% static 'js/plugins/jvectormap/jquery-jvectormap-world-mill-en.js' %}"></script>
-
-    <!-- Toastr -->
-    <script src="{% static 'js/plugins/toastr/toastr.min.js' %}"></script>
-
-    <script>
-        $(document).ready(function() {
-            setTimeout(function() {
-                toastr.options = {
-                    closeButton: true,
-                    progressBar: true,
-                    showMethod: 'slideDown',
-                    timeOut: 4000
-                };
-                toastr.success('Bienvenido Juan Jose', 'RI UNAB');
-            }, 1300);
+<script>
+    $(document).ready(function(){
+        var actual = "#information"
+        $("#comment_tab").click(function(){
+            if ($(actual) != $(this)){
+                $(actual).hide();
+                $("#commentaries").show();
+                actual = "#commentaries";
+            }
         });
-    </script>
+        $("#info_tab").click(function(){
+            if ($(actual) != $(this)){
+                $(actual).hide();
+                $("#information").show();
+                actual = "#information"
+            }
+        });
+    });
+    {% if not threadform %}
+      $("#addThread").modal()
+    {% endif  %}
 
-    <script>
-    	function orderThreads() {
+    function orderThreads() {
     	   var btn = document.getElementById("orderbtn");
          var sortOrder = ""
          if (btn.value == "None") {
@@ -303,7 +109,7 @@
            sortOrder = "Ascending"
          }
          $.ajax({
-           url : "{% url 'forum' %}",
+           url : $(this).attr('action'),
            type : "POST",
            data : {
              rtype : 'sort',
@@ -317,9 +123,10 @@
               if(thread != null){
                 threadFeed.removeChild(thread);
               }
+            var datepublish = new Date(data[x]['publish_date'])
             threadFeed.innerHTML+=
             '<div id="Thread_'+data[x]['pk']+'" class="feed-element" align="left">'+
-              '<small class="pull-left">'+data[x]['publish_date']+'</small>'+
+              '<small class="pull-left">'+datepublish.toLocaleString()+'</small>'+
                 '<div class="media-body ">'+
                     '<h3 style="padding-left: 20px;">'+data[x]['name']+'</h3>'+
                 '</div>'+
@@ -336,9 +143,7 @@
            },
          });
     	}
-  	</script>
 
-	<script>
   	function rateThread(idRatingNumber,idRatingStar) {
   	   var x = document.getElementById(idRatingNumber);
        var y = document.getElementById(idRatingStar);
@@ -350,9 +155,7 @@
            y.style.display = "none";
          }
   	}
-	</script>
 
-  <script type="text/javascript">
     function getCookie(name){
         var cookieValue = null;
         if (document.cookie && document.cookie != ''){
@@ -367,9 +170,7 @@
         }
         return cookieValue
     }
-	</script>
 
-	<script>
   	function postRating(threadPk,idRatingNumber,idRatingStar,idRatingNumberTxt,idStar) {
       var x = document.getElementById(idRatingNumber);
       var y = document.getElementById(idRatingStar);
@@ -377,7 +178,7 @@
       if (x.style.display === "none") {
           var ratingUser = idStar.replace("rating", "").split("_")[0];
           $.ajax({
-            url : "{% url 'forum' %}",
+            url : $(this).attr('action'),
             type : "POST",
             data : {
               rtype : 'rate',
@@ -396,5 +197,7 @@
   		    y.style.display = "inline";
       }
   	}
-	</script>
-</body><style type="text/css"></style></html>
+</script>
+
+
+{% endblock javascript %}

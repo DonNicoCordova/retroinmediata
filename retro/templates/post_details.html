@@ -284,11 +284,12 @@
              if(answer != null){
                answerFeed.removeChild(answer);
              }
+            var datepublish = new Date(data[x]['publish_date']);
             var answerHtml =
                        '<div id="Answer_'+data[x]['pk']+'" class="feed-element" align="left">'+
                             '<div class="row">'+
                                 '<div class="col-lg-12 col-md-12 col-sm-12">'+
-                                    '<small class="pull-left">'+data[x]['publish_date']+'</small>'+
+                                    '<small class="pull-left">'+datepublish.toLocaleString()+'</small>'+
                                     '<a href="profile.html" class="pull-right">'+
                                         '<img id="imgprof_'+data[x]['pk']+'" alt="image" class="img-circle">'+
                                     '</a>'+

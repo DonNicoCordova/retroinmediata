@@ -329,14 +329,13 @@ def post(request):
     template_name = 'Post.html'
     return render(request, template_name, data)
 
-def forum(request):
+@login_required(login_url='/auth/login/')
+def forum(request, pk):
         template_name = 'forum.html'
 
-        #For Testing
-        user = request.user.userprofile
-        sectionPk = 1
+        userprofile = request.user.userprofile
 
-        allThreads = Thread.objects.filter(section=sectionPk)
+        allThreads = Thread.objects.filter(section=pk)
         section = Section.objects.get(pk=allThreads[0].section.id)
         sectionNRC = section.nrc
 
@@ -374,14 +373,14 @@ def forum(request):
                 return JsonResponse(dictThreadsSorted)
 
             if request.POST['rtype']=='rate':
-                if ThreadRanking.objects.filter(userprofile=user.id,thread=request.POST["thread"]).exists():
-                    trank = ThreadRanking.objects.get(userprofile=user.id,thread=request.POST["thread"])
+                if ThreadRanking.objects.filter(userprofile=userprofile.id,thread=request.POST["thread"]).exists():
+                    trank = ThreadRanking.objects.get(userprofile=userprofile.id,thread=request.POST["thread"])
                     trank.rating = request.POST["rating"]
                 else:
                     thread = Thread.objects.get(pk=request.POST["thread"])
-                    trank = ThreadRanking(userprofile=user,thread=thread,rating=request.POST["rating"])
+                    trank = ThreadRanking(userprofile=userprofile,thread=thread,rating=request.POST["rating"])
                 trank.save()
-                allThreads = Thread.objects.filter(section=sectionPk)
+                allThreads = Thread.objects.filter(section=pk)
                 dictRatings = {}
 
                 for i in allThreads:
