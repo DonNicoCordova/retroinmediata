@@ -1,6 +1,6 @@
 from django import template
 from retro.models import Student, Section, Post
-from alertas.models import Alerta, AlertMinute
+from alertas.models import Alerta, AlertMinute, AnswerReportUser
 from datetime import datetime, timedelta
 
 register = template.Library()
@@ -38,5 +38,9 @@ def loadAlert(request):
         for x in list_post_to_comment:
             if not x.comment_set.filter(author=request.user.userprofile).exists():
                 message.append(('La pregunta <b>' + x.title + '</b> está a punto de superar tu umbral de respuesta', x.publish_date))
+    if request.user.userprofile.is_dcareer:
+        list_alert_post = AnswerReportUser.objects.filter(director=request.user.userprofile)
+        for x in list_alert_post:
+            message.append((x.report.description, x.report.publish_date))
     message.sort(key=lambda x: x[1], reverse=True)
     return message

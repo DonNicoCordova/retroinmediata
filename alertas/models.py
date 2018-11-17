@@ -11,6 +11,9 @@ class AnswerReport(models.Model):
     description = models.CharField(max_length=500)
     publish_date = models.DateTimeField(default=timezone.now)
 
+    def createReport(self, student, teacher, director):
+        return AnswerReportUser.objects.create(report=self, student=student, teacher=teacher, director=director)
+
     def __str__(self):
         return "Reporte: %s con fecha %s" % (self.description, self.publish_date)
 
@@ -19,7 +22,8 @@ class AnswerReportUser(models.Model):
     report = models.OneToOneField('AnswerReport', on_delete=models.CASCADE)
     student = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='student_report')
     teacher = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='teacher_report')
-
+    director = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='director_report')
+    status = models.BooleanField(default=True)
     class Meta:
         unique_together = (('report', 'student', 'teacher'),)
 

@@ -52,7 +52,7 @@
     <div class="col-lg-4" style="width: 100%;">
         <div class="ibox float-e-margins">
             <div class="ibox-title" style="width: 100%;height: 100px;">
-                <small class="pull-left">Ayer 5:20 pm - 12.06.2018</small>
+                <small class="pull-left">{{ post.publish_date }}</small>
                 <br>
                 <div class="ibox-tools">
                     <div id="title_edit" style="display:none">
@@ -83,11 +83,14 @@
                 {% if post.author == request.user.userprofile %}
                 <div class="row">
                     <div class="pull-right col-md-2 col-sm-2 col-lg-2">
-                        <button class="pull-right btn btn-warning btn-circle" type="button" data-toggle="tooltip"
-                            data-placement="top" title="" data-original-title="Editar" id="editar_pregunta"><i class="fa fa-pencil"></i>
+                        <button class="m-l-xs pull-right btn btn-warning btn-circle" type="button" data-toggle="tooltip"
+                                data-placement="top" title="Editar" data-original-title="Editar" id="editar_pregunta"><i class="fa fa-pencil"></i>
                         </button>
-                        <button class="pull-right btn btn-info btn-circle" type="button" data-toggle="tooltip"
-                            data-placement="top" title="" data-original-title="Aceptar" id="aceptar_cambio" style="display:none"><i class="fa fa-check"></i>
+                      <button class="pull-right btn btn-danger btn-circle" type="button" data-toggle="tooltip"
+                              data-placement="top" title="Reportar Profesor" id="reportar"><i class="fa fa-times"></i>
+                      </button>
+                      <button class="pull-right btn btn-info btn-circle" type="button" data-toggle="tooltip"
+                            data-placement="top" title="Aceptar Cambios" data-original-title="Aceptar" id="aceptar_cambio" style="display:none"><i class="fa fa-check"></i>
                         </button>
                     </div>
                 </div>
@@ -239,7 +242,7 @@
             var ratingUser = idStar.replace("rating", "").split("_")[0];
 
             $.ajax({
-                url: "{% url 'question' %}",
+                url: "{% url 'post_details' post.pk %}",
                 type: "POST",
                 data: {
                     rating: ratingUser,
@@ -351,48 +354,62 @@
             });
         });
         $(".editar").click(function () {
-            var pk = $(this).data("pk");
-            $("#edit_field"+pk).show();
-			$("#description"+pk).hide();
-			$("#editar"+pk).hide();
-			$("#aceptar"+pk).show();
-
+          var pk = $(this).data("pk");
+          $("#edit_field"+pk).show();
+          $("#description"+pk).hide();
+          $("#editar"+pk).hide();
+          $("#aceptar"+pk).show();
         });
-        $("#editar_pregunta").click(function () {
-            $("#title_edit").show();
-            $("#title").hide();
-            $("#aceptar_cambio").show();
-            $("#editar_pregunta").hide();
-            $("#post_edit").show();
-            $("#post_description").hide();
+      $("#editar_pregunta").click(function () {
+          $("#title_edit").show();
+          $("#title").hide();
+          $("#aceptar_cambio").show();
+          $("#editar_pregunta").hide();
+          $("#reportar").hide();
+          $("#post_edit").show();
+          $("#post_description").hide();
+      });
+      $("#aceptar_cambio").click(function () {
+          let data = {
+              csrfmiddlewaretoken: getCookie('csrftoken'),
+              pk: "{{post.pk}}",
+              title: $("#titulo_pregunta").val(),
+              comment:$('#summernote_post').summernote('code'),
+          };
+          console.log(data)
+          $.ajax({
+              url: '{% url "update_post" %}',
+              type: "POST",
+              data: data,
+              success: function (response) {
+                  if (response.message == "ok") {
+                      console.log("Entre al if");
+          $("#post_description").html(response.text);
+          $("#post_title").html("Pregunta: "+ response.title);
+          $("#title_edit").hide();
+                      $("#title").show();
+                      $("#aceptar_cambio").hide();
+                      $("#editar_pregunta").show();
+                      $("#reportar").show();
+                      $("#post_edit").hide();
+                      $("#post_description").show();
+                  }
+              }
+          });
+      });
+      $('#reportar').on('click', function () {
+        $.ajax({
+            url: '{% url "post_details" post.pk %}',
+            type: "POST",
+            data: {
+              csrfmiddlewaretoken: getCookie('csrftoken'),
+              pk: {{ post.pk }},
+              action: 'report_teacher'
+            },
+            success: function () {
+            }
         });
-        $("#aceptar_cambio").click(function () {
-            let data = {
-                csrfmiddlewaretoken: getCookie('csrftoken'),
-                pk: "{{post.pk}}",
-                title: $("#titulo_pregunta").val(),
-                comment:$('#summernote_post').summernote('code'),
-            };
-            console.log(data)
-            $.ajax({
-                url: '{% url "update_post" %}',
-                type: "POST",
-                data: data,
-                success: function (response) {
-                    if (response.message == "ok") {
-                        console.log("Entre al if");
-						$("#post_description").html(response.text);
-						$("#post_title").html("Pregunta: "+ response.title);
-						$("#title_edit").hide();
-                        $("#title").show();
-                        $("#aceptar_cambio").hide();
-                        $("#editar_pregunta").show();
-                        $("#post_edit").hide();
-                        $("#post_description").show();
-                    }
-                }
-            });
-        });
+      })
     });
 </script>
 {% endblock javascript %}

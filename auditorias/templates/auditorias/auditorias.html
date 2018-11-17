@@ -58,7 +58,7 @@
 {% block breadcrumb %}
 <div class="row wrapper border-bottom white-bg page-heading" style="padding-bottom: 0px;">
     <div class="col-lg-10">
-        <h2>Crear Alerta</h2>
+        <h2>Generar Auditoría</h2>
     </div>
     <div class="col-lg-2">
 
@@ -73,8 +73,10 @@
                 <h1 class = 'text-center' style="margin-top:30px;">Generar Auditoria</h1>
 
                 <form action="" method="POST" enctype="multipart/form-data">{% csrf_token %}
-                    {{form}}
-                    <input type="submit" value="Enviar" class="btn btn-primary btn-lg btn-block">
+                    <label for="">Alerta</label>
+                    {{form.alert}}
+                    {{ form.alert.errors }}
+                    <input type="submit" value="Generar Auditoría" class="m-t-md btn btn-primary btn-lg btn-block">
                 </form>
                 <br>
             </div>

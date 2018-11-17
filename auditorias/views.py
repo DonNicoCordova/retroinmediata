@@ -3,26 +3,28 @@ from retro_auth.models  import *
 from retro.models import *
 from .models import ForoAudit
 from auditorias.forms import edit_umbral, ForoAuditForm
+from alertas.forms import AnswerReportUser
 import datetime
 
 
 def auditorias(request):
     data = {}
-    data['form'] = ForoAuditForm()
-    if request.POST:
-        data['form'] = ForoAuditForm(request.POST)
-        print(request.POST)
-        if data['form'].is_valid():
-            no_contestadas = []
-            secciones = data['form'].section_set.all()
-            for post in Post.objects.filter(thread__section__teacher=docente):
-                if post.comment_set.filter(author=docente).exists():
-                    pass
-                else:
-                    no_contestadas.append(post)
-        else:
-            return render(request, "auditorias/auditorias.html", data)
-    return render(request, "auditorias/auditorias.html", data)
+    if request.user.userprofile.is_dcareer:
+        data['form'] = ForoAuditForm(request=request)
+        if request.POST:
+            data['form'] = ForoAuditForm(request.POST, request=request)
+            if data['form'].is_valid():
+                data['form'] = data['form'].save(commit=False)
+                alert = AnswerReportUser.objects.get(report_id=request.POST['alert'])
+                data['form'].director = request.user.userprofile
+                data['form'].student = alert.student
+                data['form'].teacher = alert.teacher
+                data['form'].save()
+                return redirect('auditorias')
+            else:
+                return render(request, "auditorias/auditorias.html", data)
+        return render(request, "auditorias/auditorias.html", data)
+    return redirect('index')
 
 
 def historial_auditorias(request):

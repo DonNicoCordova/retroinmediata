@@ -28,7 +28,7 @@ class Career(models.Model):
 class CareerSubjectSection(models.Model):
     career = models.ForeignKey('Career', on_delete=models.CASCADE)
     subject = models.ForeignKey('Subject', on_delete=models.CASCADE)
-    section = models.ForeignKey('Section', on_delete=models.CASCADE)
+    section = models.OneToOneField('Section', on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (('career', 'subject', 'section'),)
