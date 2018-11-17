@@ -4,4 +4,3 @@
 .vscode
 media
 db.sqlite3
-retroinmediata

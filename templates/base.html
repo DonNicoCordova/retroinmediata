@@ -42,23 +42,88 @@
 
                     </ul>
                 </li>
+
+<!-- Notificacion la campanita -->
+
                 <li class="dropdown" id="notifications">
-                    <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
-                        <i class="fa fa-bell"></i>  <span class="label label-primary" ></span>
+                    <a class="notificationsPost dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                        {% if countNotifications > 0 %}
+                        <i class="fa fa-bell"></i>  <span class="countNotificationPost label label-primary" >{{countNotifications}}</span>
+                        {% else %}
+                        <i class="fa fa-bell"></i>
+                        {% endif %}
                     </a>
-                    <ul class="dropdown-menu dropdown-alerts">
-                        <li>
+
+                    <!-- Aqui va la informacion de la notificacion -->
+                    <ul id="notifications" class="dropdown-menu dropdown-alerts">
+
+                        <!-- Aqui va la informacion EN LOS <li> -->
+                     {% for x in notificaciones %}
+                        <li id="N" data-pk="{{ x.pk }}">
                             <a href="#">
                                 <div>
                                     <i class="fa fa-envelope fa-fw"></i>
+                                    <span class="text-muted ">{{x.post}}</span>
                                     <span class="pull-right text-muted small">4 minutes ago</span>
                                 </div>
                             </a>
                         </li>
+                        {% endfor %}  
+
+                        <!-- Aqui va la informacion EN LOS <li> -->
+                        {% for x in lista_hilo %}
+                        <li>
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-envelope fa-fw"></i>
+                                    <span class="text-muted ">{{x.thread}} se respondio algo </span>
+                                    <span class="pull-right text-muted small">4 minutes ago</span>
+                                </div>
+
+                            </a>
+                        </li>
+                        {% endfor %}  
+
+                        {% for x in list_no_comment %}
+                        <li id="N" data-pk="{{ x.pk }}">
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-envelope fa-fw"></i>
+                                    <span class="text-muted ">{{x.tittle}}</span>
+                                    <span class="pull-right text-muted small">4 minutes ago</span>
+                                </div>
+                            </a>
+                        </li>
+                        {% endfor %}  
+
+                         {% for x in list_to_comment %}
+                        <li id="N" data-pk="{{ x.pk }}">
+                            <a href="#">
+                                <div>
+                                    <i class="fa fa-envelope fa-fw"></i>
+                                    <span class="text-muted ">{{x.post}}</span>
+                                    <span class="pull-right text-muted small">4 minutes ago</span>
+                                </div>
+                            </a>
+                        </li>
+                        {% endfor %}  
+
                         <li class="divider"></li>
-                        <a id="borrar"><strong class="center-text">Borrar Notificaciones</strong></a>
+                        <!-- Esto es el texto que sale bajo la campana, agregar funcionalidad -->
+                        <a id="borrar"><strong class="center-text"></strong></a>
                     </ul>
                 </li>
+                <!--    
+                <li class="dropdown" id="notifications">
+                    <a class="notificationsThread dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                        {% if countThreads > 0 %}
+                        <i class="fa fa-bell"></i>  <span class="countNotificationThread label label-primary" >{{cantidad2}}</span>
+                        {% else %}
+                        <i class="fa fa-bell"></i>
+                        {% endif %}
+                    </a>
+                </li>
+            -->
 
 
                 <li>
@@ -129,6 +194,40 @@
 
     <!-- Sparkline demo data  -->
     <!-- <script src="{% static 'js/demo/sparkline-demo.js' %}"></script> -->
+
+    <script>
+        $(document).ready(function() {
+            $('.notificationsPost').on('click', function() {
+                var pks = []
+                $('.countNotificationPost').html("");
+
+                $('#notifications #N').each(function() {
+                    pks.push($(this).data('pk'));
+                });
+
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'viewNotifications' %}",
+                    data: {
+                        csrfmiddlewaretoken: "{{ csrf_token }}",
+                        info: pks,
+                    },
+                    success: function(response) {
+                    },
+                    error: function() {
+                    }
+                });
+
+            });
+
+            $('.notificationsThread').on('click', function() {
+                $('.countNotificationThread').html("");
+            });
+        });
+
+
+
+    </script>
 
     {% block javascript %}
 
