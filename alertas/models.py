@@ -3,7 +3,7 @@ from django.db import models
 from django.utils import timezone
 from retro_auth.models import UserProfile
 from retro.models import Post
-
+from minutas.models import Minute
 # Create your models here.
 
 
@@ -29,12 +29,22 @@ class AnswerReportUser(models.Model):
 
 class Alerta(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
-    student = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='student_report_question')
-    student = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='student_report_answer')
+    student_question = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='student_report_question')
+    student_answerd = models.ForeignKey(UserProfile, on_delete=models.SET_NULL, null=True, related_name='student_report_answer')
+    publish_date = models.DateTimeField(default=timezone.now)
     status = models.BooleanField(default=True)
     #hilo = funcion(retorna si es hilo True, si no False )
 
 
     # def __str__(self):
-    # #Arreglamos esta funcion para que aparezca el nombre y el rut del usuario BIEN
-    #     return 'El usuario %s respondio a %s (que hizo la pregunta)' % (self.user_ans.user,self.user_ask.user )
+    #Arreglamos esta funcion para que aparezca el nombre y el rut del usuario BIEN
+        # return 'El usuario %s respondio a %s (que hizo la pregunta)' % (self.user_ans.user,self.user_ask.user )
+
+class AlertMinute(models.Model):
+    minutes = models.ForeignKey(Minute, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserProfile, on_delete=models.CASCADE)
+    publish_date = models.DateTimeField(default=timezone.now)
+    status = models.BooleanField(default=True)
+
+    # def __str__(self):
+    #     return 'El usuario %s modifico la minuta %s ' % (self.user ,self.minutes.thematic)

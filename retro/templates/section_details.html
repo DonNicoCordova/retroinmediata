@@ -155,7 +155,7 @@
           {% endwith %}
             <div class="col-md-12">
               {% for x in threadpage %}
-                <div class="vote-item">
+                <div class="vote-item aaaa" data-pk="{{ x.pk }}">
                     <div class="row">
                         <div class="col-md-10">
                             <div class="vote-actions">
@@ -173,7 +173,13 @@
                             <div class="vote-info">
                                 <i class="fa fa-question-circle-o"></i> <a href="#">Preguntas ({{ x.post_set.all.count }})</a>
                                 <i class="fa fa-clock-o"></i> <a href="#">{% with x.getDiference as difference %} {{ difference }} {% if difference == 1 %}Hora{% else %}Horas{% endif %} atrás {% endwith %}</a>
-  {#                                <i class="fa fa-user"></i> <a href="#">Andrew Williams</a>#}
+                                <span class="seguirHilo">
+                                  {% if x.pk in follow %}
+                                  <i class="fa fa-arrow-right"></i> <a href="#">Seguir hilo</a>
+                                  {% else %}
+                                    <i class="fa fa-times"></i> <a href="#">Dejar de seguir el hilo</a>
+                                  {% endif %}
+                                </span>
                             </div>
                         </div>
                         <div class="col-md-2 ">
@@ -232,6 +238,7 @@
         <div class="modal-content">
           <form action="{% url 'section_details' section.pk %}" class="form-horizontal" method="post">
             {% csrf_token %}
+            <input type="text" id="id_action" name="action" value="createThread" class="hidden">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 <h4 class="modal-title">Modal title</h4>
@@ -260,6 +267,21 @@
 {% block javascript %}
 
 <script>
+    function getCookie(name){
+      var cookieValue = null;
+      if (document.cookie && document.cookie != ''){
+          var cookies = document.cookie.split(';');
+          for(var i = 0; i < cookies.length; i++){
+              var cookie = jQuery.trim(cookies[i]);
+
+              if(cookie.substring(0,name.length + 1) == (name + '=')){
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue
+    }
     $(document).ready(function(){
         var actual = "#information"
         $("#comment_tab").click(function(){
@@ -276,6 +298,29 @@
                 actual = "#information"
             }
         });
+      $('.seguirHilo').on('click', function () {
+        let span = $(this);
+        let i = span.find('i');
+        let parent = $(this).parents().eq(3);
+        $.ajax({
+          url:'{% url "section_details" section.pk %}',
+          type: "POST",
+          data: {
+            csrfmiddlewaretoken: getCookie('csrftoken'),
+            action: 'followThread',
+            pk: parent.data('pk'),
+          },
+          success: function() {
+            if (i.hasClass('fa-arrow-right')){
+              i.removeClass('fa-arrow-right').addClass('fa-times');
+              span.find('a').text('Degar de seguir el hilo');
+            }else{
+              i.removeClass('fa-times').addClass('fa-arrow-right');
+              span.find('a').text('Seguir el Hilo');
+            }
+          }
+        });
+      });
     });
     {% if not threadform %}
       $("#addThread").modal()

@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from retro.models import CommentRanking, ThreadRanking
+from retro.models import CommentRanking, ThreadRanking, ThreadFollower
 from django.db.models import Q
 from retro_auth.models import UserProfile
 from retro.forms import post_form, post_form_document
@@ -116,14 +116,22 @@ def section_details(request, pk):
         data['threadform'] = ThreadForms()
         data['formvalid'] = True
         if request.POST:
-            data['threadform'] = ThreadForms(request.POST)
-            if data['threadform'].is_valid():
-                data['threadform'] = data['threadform'].save(commit=False)
-                data['threadform'].section = section
-                data['threadform'].save()
-                return HttpResponseRedirect(reverse('section_details', kwargs={'pk': pk}))
-            else:
-                data['formvalid'] = False
+            if request.POST['action'] == 'createThread':
+                data['threadform'] = ThreadForms(request.POST)
+                if data['threadform'].is_valid():
+                    data['threadform'] = data['threadform'].save(commit=False)
+                    data['threadform'].section = section
+                    data['threadform'].save()
+                    return HttpResponseRedirect(reverse('section_details', kwargs={'pk': pk}))
+                else:
+                    data['formvalid'] = False
+            elif request.POST['action'] == 'followThread':
+                follow = ThreadFollower.objects.filter(userprofile=request.user.userprofile, thread_id=request.POST['pk'])
+                if follow:
+                    follow[0].delete()
+                else:
+                    ThreadFollower.objects.create(userprofile=request.user.userprofile, thread_id=request.POST['pk'])
+                return JsonResponse({})
         data['section'] = section
         page = request.GET.get('page')
         search = request.GET.get('search')
@@ -140,6 +148,7 @@ def section_details(request, pk):
             data['threadpage'] = paginator.page(1)
         except EmptyPage:
             data['threadpage'] = paginator.page(paginator.num_pages)
+        data['follow'] = ThreadFollower.objects.filter(thread__in=data['threadpage']).values_list('thread', flat=True)
     else:
         messages.error(request, 'No existe la sección.')
         return HttpResponseRedirect(reverse('index'))
