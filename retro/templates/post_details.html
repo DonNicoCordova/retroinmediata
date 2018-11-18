@@ -55,6 +55,8 @@
                 <small class="pull-left">{{ post.publish_date }}</small>
                 <br>
                 <div class="ibox-tools">
+                    <input type="hidden" id="currentUserId" value={{request.user.userprofile.pk}}>
+                    <input type="hidden" id="mediaPrefix" value='/media/'>
                     <div id="title_edit" style="display:none">
                         <div class="form-group">
                             <label for="exampleInputEmail2" class="sr-only">Titulo de Pregunta:</label>
@@ -96,11 +98,12 @@
                 </div>
                 {% endif %}
             </div>
+            <button id="orderbtn" type="button" class="btn btn-outline btn-xs btn-primary pull-right" value="None" onclick="orderAnswers()" style="margin-top: 10px;">Ordenar por Calificación</button>
             <div class="ibox-content">
                 <div class="row">
                     <div id="feedAnswers" class="feed-activity-list">
                         {% for x,y,z in Comments %}
-                        <div class="feed-element" align="left">
+                        <div id="Answer_{{x.pk}}" class="feed-element" align="left">
                             <div class="row">
                                 <div class="col-lg-12 col-md-12 col-sm-12">
                                     <small class="pull-left">{{x.publish_date}}</small>
@@ -108,15 +111,13 @@
                                         <img alt="image" class="img-circle" src="{% static 'img/default_user.png' %}">
                                     </a>
                                     <div class="media-body ">
-                                        <small class="pull-right" style=""> <b>{{x.author.user.first_name}}
-                                                {{x.author.user.last_name}}</b></small><br>
+                                        <small class="pull-right" style=""> <b>{{x.author.user.first_name}} {{x.author.user.last_name}}</b></small><br>
                                         <div class="well" id="description{{x.pk}}">{{x.description|safe}}</div>
                                         <div id="edit_field{{x.pk}}" style="display:none">
                                             <div placeholder="Escriba su comentario" class="form-control summernote" type="text"
                                                 id="summernote{{x.pk}}" name="description">{{x.description|safe}}</div>
                                         </div>
                                         <div style="padding-top: 2px; padding-bottom: 2px;">
-
                                             {% if z != "" %}
                                                 <a href="{% get_media_prefix %}{{z.document}}" title="Imagen" download="{{z.document}}" >
                                                 <span>
@@ -129,8 +130,6 @@
                                                 </span>
                                             </a>
                                             {% endif %}
-
-
                                         </div>
                                         <div id="edit_field{{x.pk}}" style="display:none">
                                             <div placeholder="Escriba su comentario" class="form-control summernote" type="text"
@@ -162,7 +161,6 @@
                                     </div>
                                 </div>
                             </div>
-
                         </div>
                         {% endfor %}
                     </div>
@@ -204,6 +202,7 @@
     <script src="{% static 'js/plugins/jasny/jasny-bootstrap.min.js' %}"></script>
 
   <script src="http://cdnjs.cloudflare.com/ajax/libs/summernote/0.8.9/summernote.js"></script>
+
   <script>
     function getCookie(name){
       var cookieValue = null;
@@ -211,7 +210,6 @@
           var cookies = document.cookie.split(';');
           for(var i = 0; i < cookies.length; i++){
               var cookie = jQuery.trim(cookies[i]);
-
                 if (cookie.substring(0, name.length + 1) == (name + '=')) {
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                     break;
@@ -220,7 +218,6 @@
         }
         return cookieValue
     }
-
     function rateAnswer(idRatingNumber, idRatingStar) {
         var x = document.getElementById(idRatingNumber);
         var y = document.getElementById(idRatingStar);
@@ -232,37 +229,128 @@
             y.style.display = "none";
         }
     }
-
     function postRating(commentPk, idRatingNumber, idRatingStar, idRatingNumberTxt, idStar) {
         var x = document.getElementById(idRatingNumber);
         var y = document.getElementById(idRatingStar);
         var z = document.getElementById(idRatingNumberTxt);
         if (x.style.display === "none") {
-            //window.alert(comment.description)
             var ratingUser = idStar.replace("rating", "").split("_")[0];
-
             $.ajax({
-                url: "{% url 'post_details' post.pk %}",
+                url: $(this).attr('action'),
                 type: "POST",
-                data: {
-                    rating: ratingUser,
-                    comment: commentPk,
-                    csrfmiddlewaretoken: getCookie('csrftoken'),
+                data : {
+                  rtype : 'rate',
+                  rating : ratingUser,
+                  comment : commentPk,
+                  csrfmiddlewaretoken : getCookie('csrftoken'),
                 },
                 success: function (data) {
                     z.innerHTML = '☆ ' + data[commentPk];
                     x.style.display = "inline";
                     y.style.display = "none";
-                    //console.log(data);
-                    //console.log(commentPk);
-                    //console.log(data[commentPk]);
                 },
             });
-
         } else {
             x.style.display = "none";
             y.style.display = "inline";
         }
+    }
+    function orderAnswers() {
+       var btn = document.getElementById("orderbtn");
+       var sortOrder = ""
+       if (btn.value == "None") {
+         btn.value = "Ascending"
+         btn.innerText = "Menor a mayor calificado ▲"
+         btn.classList.add("btn-primary");
+         sortOrder = "Ascending"
+       }else if (btn.value == "Ascending") {
+         btn.value = "Descending"
+         btn.innerText = "Mayor a menor calificado ▼"
+         sortOrder = "Descending"
+       }else if (btn.value == "Descending") {
+         btn.value = "Ascending"
+         btn.innerText = "Menor a mayor calificado ▲"
+         sortOrder = "Ascending"
+       }
+       $.ajax({
+         url : $(this).attr('action'),
+         type : "POST",
+         data : {
+           rtype : 'sort',
+           order : sortOrder,
+           csrfmiddlewaretoken : getCookie('csrftoken'),
+         },
+         success : function(data){
+           var answerFeed = document.getElementById("feedAnswers");
+           $('#feedAnswers').html('');
+           var answerHtml = ''
+           for (x in data){
+             var answer = document.getElementById("Answer_"+x);
+             if(answer != null){
+               answerFeed.removeChild(answer);
+             }
+            var datepublish = new Date(data[x]['publish_date']);
+            answerHtml +=
+                       '<div id="Answer_'+data[x]['pk']+'" class="feed-element" align="left">'+
+                            '<div class="row">'+
+                                '<div class="col-lg-12 col-md-12 col-sm-12">'+
+                                    '<small class="pull-left">'+datepublish.toLocaleString()+'</small>'+
+                                    '<a href="profile.html" class="pull-right">'+
+                                        '<img id="imgprof_'+data[x]['pk']+'" alt="image" class="img-circle" src="'+"{% static 'img/default_user.png' %}"+'">'+
+                                    '</a>'+
+                                    '<div class="media-body ">'+
+                                      '<small class="pull-right" style=""> <b>'+data[x]['authorName']+'</b></small><br>'  +
+                                      '<div class="well" id="description' + data[x]['pk'] + '">'+data[x]['description']+'</div>'+
+                                      '<div id="edit_field'+data[x]['pk']+'" style="display:none">'+
+                                            '<div placeholder="Escriba su comentario" class="form-control summernote" type="text"'+
+                                                'id="summernote'+data[x]['pk']+'" name="description">'+data[x]['description']+'</div>'+
+                                        '</div>'+
+                                        '<div id="file_'+data[x]['pk']+'" style="padding-top: 2px; padding-bottom: 2px;">';
+            if(data[x]['file'] != ""){
+                  answerHtml += '<a href="'+document.getElementById("mediaPrefix").value+data[x]['fileDocument']+'" title="Imagen" download="'+data[x]['fileDocument']+'">'+
+                                                '<span>'+
+                                                     '<img src="'+document.getElementById("mediaPrefix").value+data[x]['fileDocument']+'" onclick="this.width=500;this.height=500;"'+
+                                                              'onmouseout="this.width=50;this.height=50;" width="50" height="50" alt="" />';
+                  if(data[x]['authorPk'] == document.getElementById("currentUserId").value){
+                      answerHtml += '<a class="imagen" data-pk="'+data[x]['file']+'">Eliminar</a>';
+                  }
+                  answerHtml += '</span> </a>';
+            }
+            answerHtml +=      '</div>'+
+                                        '<div id="edit_field'+data[x]['pk']+'" style="display:none">'+
+                                            '<div placeholder="Escriba su comentario" class="form-control summernote" type="text"'+
+                                                'id="summernote" name="description">'+data[x]['description']+'</div>'+
+                                        '</div>'+
+                                    '</div>'+
+                                '</div>'+
+                                '<div class="col-lg-12 col-md-12 col-sm-12">'+
+                                    '<div id = "row_'+data[x]['pk']+'" class="row">'+
+                                        '<div class="col-md-6 col-lg-6">'+
+                                          '<button id="ratingNumber_'+x+'" class="ratingNumber"'+'onclick="rateAnswer(this.id,&#39ratingStars_'+x+'&#39)"style="display: inline;"><b id="ratingNumberTxt_'+x+'" style="font-size: 18px; color: gold;">☆ '+data[x]['rating']+'</b></button>'+
+                                          '<small id="ratingStars_'+x+'" class="rating" style="display: none; font-size: 150%;">'+
+                                            '<span id="rating5_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                                            '<span id="rating4_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                                            '<span id="rating3_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                                            '<span id="rating2_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                                            '<span id="rating1_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                                          '</small>'+
+                                        '</div>';
+              if(data[x]['authorPk'] == document.getElementById("currentUserId").value){
+              answerHtml +=  '<div class="col-md-offset-3 col-md-3 col-lg-3 ">'+
+                                           '<a class="btn btn-sm btn-warning pull-right editar" id="editar'+data[x]['pk']+'" data-pk="'+data[x]['pk']+'" onclick ="editAnswer()">Editar</a>'+
+                                           '<a class="btn btn-sm btn-info pull-right aceptar" id="aceptar'+data[x]['pk']+'" style="display:none" data-pk="'+data[x]['pk']+'">Aceptar</a>'+
+                                           '<a class="btn btn-sm btn-danger pull-right eliminar" data-pk="'+data[x]['pk']+'">Eliminar</a>'+
+                                        '</div></div>'
+              }
+              answerHtml += '</div> </div> </div>';
+              $('#feedAnswers').html(answerHtml);
+              $('.summernote').summernote({
+                  toolbar: false,
+                  height: 100,
+              });
+          }
+         },
+       });
     }
     function upload(event) {
         event.preventDefault();
@@ -285,14 +373,19 @@
         });
         return false;
     }
+    function editAnswer(){
+      var pk = $(this).data("pk");
+      $("#edit_field"+pk).show();
+      $("#description"+pk).hide();
+      $("#editar"+pk).hide();
+      $("#aceptar"+pk).show();
+    }
     $(document).ready(function () {
         $('.summernote').summernote({
             toolbar: false,
             height: 100,
         });
-
         $(".imagen").click(function () {
-
             var pk = $(this).data("pk");
             $.ajax({
                 url: '{% url "delete_imag" %}',
@@ -311,8 +404,7 @@
         $(function () {
             $('form').submit(upload);
         });
-
-        $(".eliminar").click(function () {
+        $(document).on('click', '.eliminar', function () {
             var pk = $(this).data("pk");
             let data = {
                 csrfmiddlewaretoken: getCookie('csrftoken'),
@@ -329,7 +421,7 @@
                 }
             });
         });
-        $(".aceptar").click(function () {
+        $(document).on('click', '.aceptar', function () {
             var pk = $(this).data("pk");
             let data = {
                 csrfmiddlewaretoken: getCookie('csrftoken'),
@@ -353,14 +445,18 @@
                 }
             });
         });
-        $(".editar").click(function () {
+        $(document).on('click', '.editar', function () {
           var pk = $(this).data("pk");
+          console.log($("#edit_field"+pk));
+          console.log($("#description"+pk));
+          console.log($("#editar"+pk));
+          console.log($("#aceptar"+pk));
           $("#edit_field"+pk).show();
           $("#description"+pk).hide();
           $("#editar"+pk).hide();
           $("#aceptar"+pk).show();
         });
-      $("#editar_pregunta").click(function () {
+      $(document).on('click', '#editar_pregunta', function () {
           $("#title_edit").show();
           $("#title").hide();
           $("#aceptar_cambio").show();
@@ -369,7 +465,7 @@
           $("#post_edit").show();
           $("#post_description").hide();
       });
-      $("#aceptar_cambio").click(function () {
+      $(document).on('click', '#aceptar_cambio',function () {
           let data = {
               csrfmiddlewaretoken: getCookie('csrftoken'),
               pk: "{{post.pk}}",
@@ -404,7 +500,7 @@
             data: {
               csrfmiddlewaretoken: getCookie('csrftoken'),
               pk: {{ post.pk }},
-              action: 'report_teacher'
+              rtype: 'report_teacher'
             },
             success: function () {
             }

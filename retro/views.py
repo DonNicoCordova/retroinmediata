@@ -10,10 +10,10 @@ from retro.models import CommentRanking, ThreadRanking, ThreadFollower, PostFoll
 from django.db.models import Q
 from retro_auth.models import UserProfile
 from .models import Section, Thread, Comment, CommentArchive, Post
-from .forms import ThreadForms, PostForms
+from .forms import ThreadForms, PostForms, post_form, post_form_document
 from alertas.models import Alerta, AnswerReport
 import re
-from django.db.models import Q
+from django.db.models import Q, Avg
 from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
@@ -87,7 +87,6 @@ def index(request):
 def section_details(request, pk):
     template_name = 'section_details.html'
     data = {}
-
     if Section.objects.filter(pk=pk).exists():
         section = Section.objects.get(pk=pk)
         data['threadform'] = ThreadForms()
@@ -112,12 +111,17 @@ def section_details(request, pk):
         data['section'] = section
         page = request.GET.get('page')
         search = request.GET.get('search')
+        order = request.GET.get('order')
+        if not order:
+            order = 'rank'
+        data['order'] = order
         if search:
             threadlist = Thread.objects.filter(Q(name__icontains=search),
-                                               section=section).order_by('-publish_date')
-            data['searchFilter'] = '&search=' + search
+                                               section=section).annotate(rank=Avg('threadranking__rating')).order_by(order)
+            data['searchFilter'] = '&search=' + search + '&order=' + order
+            data['searchinput'] = search
         else:
-            threadlist = Thread.objects.filter(section=section).order_by('-publish_date')
+            threadlist = Thread.objects.filter(section=section).annotate(rank=Avg('threadranking__rating')).order_by(order)
         paginator = Paginator(threadlist, 8)
         try:
             data['threadpage'] = paginator.page(page)
@@ -192,18 +196,14 @@ def thread_details(request, pk):
 
 def post_details(request, pk):
     template_name = "post_details.html"
+    userprofile = request.user.userprofile
     data = {}
     if Post.objects.filter(pk=pk).exists():
         post = Post.objects.get(pk=pk)
-        if request.POST:
-            if request.POST['action'] == 'report_teacher':
-                alert = AnswerReport.objects.create(description='El alumno ' + request.user.first_name + ' ' + request.user.last_name + ' ha reportado que el profesor <b>'
-                                                                + post.thread.section.teacher.user.first_name + ' ' + post.thread.section.teacher.user.last_name +
-                                                                '</b> no ha contestado la pregunta: <b>' + post.title + '</b>')
-                alert.createReport(request.user.userprofile, post.thread.section.teacher, post.thread.section.careersubjectsection.career.director)
-        all_comment = Comment.objects.filter(post=post)
-        listComments = []
-        for i in all_comment:
+        allcomments = Comment.objects.filter(post=post)
+        listcommentranks = []
+
+        for i in allcomments:
             rankingSum = 0
             rankingAvg = 0.0
             numRatings = 0
@@ -218,11 +218,87 @@ def post_details(request, pk):
 
             try:
                 file = CommentArchive.objects.get(comment=i)
-                listComments.append(tuple((i, rankingAvg, file)))
+                listcommentranks.append(tuple((i, round(rankingAvg, 1), file)))
             except:
-                listComments.append(tuple((i, rankingAvg, "")))
-        data['Comments'] = listComments
+                listcommentranks.append(tuple((i, round(rankingAvg, 1), "")))
+        data['Comments'] = listcommentranks
         data['post'] = post
+
+        if request.POST:
+            if 'rtype' in request.POST:
+                if request.POST['rtype'] == 'report_teacher':
+                    alert = AnswerReport.objects.create(
+                        description='El alumno ' + request.user.first_name + ' ' + request.user.last_name + ' ha reportado que el profesor <b>'
+                                    + post.thread.section.teacher.user.first_name + ' ' + post.thread.section.teacher.user.last_name +
+                                    '</b> no ha contestado la pregunta: <b>' + post.title + '</b>')
+                    alert.createReport(request.user.userprofile, post.thread.section.teacher,
+                                       post.thread.section.careersubjectsection.career.director)
+                    return JsonResponse({})
+
+                if request.POST['rtype']=='sort':
+                    sortedList = []
+                    if request.POST['order']=='Ascending':
+                        sortedList = sorted(listcommentranks,key=lambda t: t[1])
+                    elif request.POST['order']=='Descending':
+                        sortedList = sorted(listcommentranks,reverse=True, key=lambda t: t[1])
+                    dictAnswersSorted = {}
+
+                    for index,items in enumerate(sortedList, start=1):
+                        dictAnswersSorted[index] = {}
+                        dictAnswersSorted[index]["pk"] = items[0].pk
+                        dictAnswersSorted[index]["description"] = items[0].description
+                        dictAnswersSorted[index]["authorPk"] = items[0].author.pk
+                        dictAnswersSorted[index]["authorName"] = '%s %s' % (items[0].author.user.first_name, items[0].author.user.last_name)
+                        dictAnswersSorted[index]["publish_date"] = items[0].publish_date
+                        dictAnswersSorted[index]["file"] = items[2]
+                        if(items[2]!=""):
+                            dictAnswersSorted[index]["file"] = items[2].pk
+                            dictAnswersSorted[index]["fileDocument"] = items[2].document.name
+                        else:
+                            dictAnswersSorted[index]["file"] = ""
+                        dictAnswersSorted[index]["rating"] = items[1]
+                        print(items[0].author.user)
+                        print(dictAnswersSorted[index])
+                    return JsonResponse(dictAnswersSorted)
+
+                if request.POST['rtype']=='rate':
+                    if CommentRanking.objects.filter(userprofile=userprofile.id, comment=request.POST["comment"]).exists():
+                        crank = CommentRanking.objects.get(userprofile=userprofile.id, comment=request.POST["comment"])
+                        crank.rating = request.POST["rating"]
+                    else:
+                        comment = Comment.objects.get(pk=request.POST["comment"])
+                        crank = CommentRanking(userprofile=userprofile, comment=comment, rating=request.POST["rating"])
+                    crank.save()
+                    comments = Comment.objects.filter(post=pk)
+                    dictRatings = {}
+
+                    for i in comments:
+                        rankingSum = 0
+                        rankingAvg = 0.0
+                        numRatings = 0
+                        rankings = CommentRanking.objects.filter(comment=i)
+
+                        for j in rankings:
+                            rankingSum += j.rating
+                            numRatings += 1
+                        if (numRatings != 0):
+                            rankingAvg = rankingSum / numRatings
+                            dictRatings[i.pk] = round(rankingAvg, 1)
+                    return JsonResponse(dictRatings)
+            else:
+                data['form'] = post_form(request.POST)
+                if data['form'].is_valid():
+                    new_comment = Comment(post=post, description=request.POST['description'],
+                                          author=userprofile)
+                    new_comment.save()
+                    if request.FILES:
+                        print(request.FILES)
+                        create_comment_archives(new_comment, request.FILES['document'])
+                    return HttpResponseRedirect(reverse('post_details', kwargs={'pk': pk}))
+                print(data['form'].errors)
+        else:
+            data['form'] = post_form()
+            data['form_arch'] = post_form_document()
     else:
         messages.error(request, 'No existe la pregunta.')
         return HttpResponseRedirect(reverse('index'))
