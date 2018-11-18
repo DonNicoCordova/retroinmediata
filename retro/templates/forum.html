@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% load static %}
+{% load retroTags %}
+{% block stylesheet %}
+
+<link href="{% static 'css/plugins/sweetalert/sweetalert.css' %}" rel="stylesheet">
+<link href="{% static 'css/plugins/chosen/bootstrap-chosen.css' %}" rel="stylesheet">
+<link href="{% static 'css/ios.css' %}" rel="stylesheet">
+<link href="{% static 'css/styles.css' %}" rel="stylesheet">
+  <style>
+    .modal {
+    text-align: center;
+    padding: 0!important;
+  }
+
+  .modal:before {
+    content: '';
+    display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+    margin-right: -4px;
+  }
+
+  .modal-dialog {
+    display: inline-block;
+    text-align: left;
+    vertical-align: middle;
+  }
+  </style>
+{% endblock stylesheet %}
+
+
+{% block breadcrumb %}
+<div class="ibox-title" style="width: 100%;height: 40px;">
+  <h5 style="padding-left: 20px;">Sección {{ SectionNRC }} - Hilos de Discusión</h5>
+  <button id="orderbtn" type="button" class="btn btn-outline btn-xs btn-primary pull-right" value="None" onclick="orderThreads()">Ordenar por Calificación</button>
+    <br>
+</div>
+{% endblock breadcrumb %}
+
+{% block content %}
+<div class="col-lg-4" style="width: 100%;">
+    <div class="ibox float-e-margins">
+
+        <div class="ibox-content">
+                <div id="feedThreads" class="feed-activity-list">
+                    {% for x,y in Threads %}
+                    <div id="Thread_{{x.pk}}" class="feed-element" align="left">
+                      <small class="pull-left">{{x.publish_date}}</small>
+                        <div class="media-body ">
+                            <a class="vote-title" href="{% url 'thread_details' x.pk %}" style="padding-left: 20px;">{{x.name}}</a>
+                        </div>
+                        <button id="ratingNumber_{{forloop.counter}}" class="ratingNumber" onclick="rateThread(this.id,'ratingStars_{{forloop.counter}}')" style="display: inline;"><b id="ratingNumberTxt__{{forloop.counter}}" style="font-size: 18px; color: gold;">☆ {{y}}</b></button>
+                        <small id="ratingStars_{{forloop.counter}}" class="rating" style="display: none; font-size: 150%;">
+                          <span id="rating5_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                          <span id="rating4_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                          <span id="rating3_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                          <span id="rating2_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                          <span id="rating1_{{forloop.counter}}" onclick="postRating({{x.pk}},'ratingNumber_{{forloop.counter}}','ratingStars_{{forloop.counter}}','ratingNumberTxt__{{forloop.counter}}',this.id)">☆</span>
+                        </small>
+                    </div>
+                    {% endfor %}
+                </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+
+
+{% block javascript %}
+
+<script>
+    $(document).ready(function(){
+        var actual = "#information"
+        $("#comment_tab").click(function(){
+            if ($(actual) != $(this)){
+                $(actual).hide();
+                $("#commentaries").show();
+                actual = "#commentaries";
+            }
+        });
+        $("#info_tab").click(function(){
+            if ($(actual) != $(this)){
+                $(actual).hide();
+                $("#information").show();
+                actual = "#information"
+            }
+        });
+    });
+    {% if not threadform %}
+      $("#addThread").modal()
+    {% endif  %}
+
+    function orderThreads() {
+    	   var btn = document.getElementById("orderbtn");
+         var sortOrder = ""
+         if (btn.value == "None") {
+           btn.value = "Ascending"
+           btn.innerText = "Menor a mayor calificado ▲"
+           btn.classList.add("btn-primary");
+           sortOrder = "Ascending"
+         }else if (btn.value == "Ascending") {
+           btn.value = "Descending"
+           btn.innerText = "Mayor a menor calificado ▼"
+           sortOrder = "Descending"
+         }else if (btn.value == "Descending") {
+           btn.value = "Ascending"
+           btn.innerText = "Menor a mayor calificado ▲"
+           sortOrder = "Ascending"
+         }
+         $.ajax({
+           url : $(this).attr('action'),
+           type : "POST",
+           data : {
+             rtype : 'sort',
+             order : sortOrder,
+             csrfmiddlewaretoken : getCookie('csrftoken'),
+           },
+           success : function(data){
+             var threadFeed = document.getElementById("feedThreads");
+             for (x in data){
+              var thread = document.getElementById("Thread_"+x);
+              if(thread != null){
+                threadFeed.removeChild(thread);
+              }
+            var datepublish = new Date(data[x]['publish_date'])
+            threadFeed.innerHTML+=
+            '<div id="Thread_'+data[x]['pk']+'" class="feed-element" align="left">'+
+              '<small class="pull-left">'+datepublish.toLocaleString()+'</small>'+
+                '<div class="media-body ">'+
+                   '<a class="vote-title" href="'+"/Hilo/"+data[x]['pk']+'" style="padding-left: 20px;">'+data[x]['name']+'</a>'+
+                '</div>'+
+                '<button id="ratingNumber_'+x+'" class="ratingNumber"'+'onclick="rateThread(this.id,&#39ratingStars_'+x+'&#39)"style="display: inline;"><b id="ratingNumberTxt_'+x+'" style="font-size: 18px; color: gold;">☆ '+data[x]['rating']+'</b></button>'+
+                '<small id="ratingStars_'+x+'" class="rating" style="display: none; font-size: 150%;">'+
+                  '<span id="rating5_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                  '<span id="rating4_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                  '<span id="rating3_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                  '<span id="rating2_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                  '<span id="rating1_'+x+'",this.id)" onclick="postRating('+data[x]['pk']+',&#39ratingNumber_'+x+'&#39,&#39ratingStars_'+x+'&#39,&#39ratingNumberTxt_'+x+'&#39,this.id)">☆</span>'+
+                '</small>'+
+            '</div>';
+            }
+           },
+         });
+    	}
+
+  	function rateThread(idRatingNumber,idRatingStar) {
+  	   var x = document.getElementById(idRatingNumber);
+       var y = document.getElementById(idRatingStar);
+       if (y.style.display === "none") {
+  		     x.style.display = "none";
+           y.style.display = "inline";
+         } else {
+  		     x.style.display = "inline";
+           y.style.display = "none";
+         }
+  	}
+
+    function getCookie(name){
+        var cookieValue = null;
+        if (document.cookie && document.cookie != ''){
+            var cookies = document.cookie.split(';');
+            for(var i = 0; i < cookies.length; i++){
+                var cookie = jQuery.trim(cookies[i]);
+                if(cookie.substring(0,name.length + 1) == (name + '=')){
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue
+    }
+
+  	function postRating(threadPk,idRatingNumber,idRatingStar,idRatingNumberTxt,idStar) {
+      var x = document.getElementById(idRatingNumber);
+      var y = document.getElementById(idRatingStar);
+  	  var z = document.getElementById(idRatingNumberTxt);
+      if (x.style.display === "none") {
+          var ratingUser = idStar.replace("rating", "").split("_")[0];
+          $.ajax({
+            url : $(this).attr('action'),
+            type : "POST",
+            data : {
+              rtype : 'rate',
+              rating : ratingUser,
+              thread : threadPk,
+              csrfmiddlewaretoken : getCookie('csrftoken'),
+            },
+            success : function(data){
+              z.innerHTML = '☆ ' + data[threadPk];
+              x.style.display = "inline";
+              y.style.display = "none";
+            },
+          });
+      } else {
+          x.style.display = "none";
+  		    y.style.display = "inline";
+      }
+  	}
+</script>
+
+
+{% endblock javascript %}
