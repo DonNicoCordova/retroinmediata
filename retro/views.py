@@ -80,7 +80,7 @@ def coincidencia(nuevo_post,Thread):
 @login_required(login_url='/auth/login/')
 def index(request):
     template_name = "index.html"
-    return render(request, template_name, {'sections': Section.objects.filter(Q(teacher=request.user.userprofile) | Q(student__student=request.user.userprofile))})
+    return render(request, template_name, {'sections': Section.objects.filter(Q(teacher=request.user.userprofile) | Q(student__student=request.user.userprofile)).distinct()})
 
 
 @login_required(login_url='/auth/login/')
