@@ -1,13 +1,12 @@
 {% load static %}
+{% load retroTags %}
 <!DOCTYPE html>
 <html>
 <head>
 
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>{% block title %}Universidad Andrés Bello | Retroalimentación Inmediata {% endblock title %}</title>
-
     <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
     <link href="{% static 'font-awesome/css/font-awesome.css' %}" rel="stylesheet">
     <link href="{% static 'css/animate.css' %}" rel="stylesheet">
@@ -43,32 +42,36 @@
                     </ul>
                 </li>
                 <li class="dropdown" id="notifications">
-                    <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
-                        <i class="fa fa-bell"></i>  <span class="label label-primary" ></span>
-                    </a>
-                    <ul class="dropdown-menu dropdown-alerts">
-                        <li>
-                            <a href="#">
-                                <div>
-                                    <i class="fa fa-envelope fa-fw"></i>
-                                    <span class="pull-right text-muted small">4 minutes ago</span>
-                                </div>
-                            </a>
-                        </li>
-                        <li class="divider"></li>
-                        <a id="borrar"><strong class="center-text">Borrar Notificaciones</strong></a>
-                    </ul>
+                    {% with request|loadAlert as Mensaje %}
+                      {% with Mensaje|length as Total %}
+                      <a class="dropdown-toggle count-info" data-toggle="dropdown" href="#">
+                          <i class="fa fa-bell"></i>  <span class="label label-primary">{% if Total != 0 %}{{ Total }}{% endif %}</span>
+                      </a>
+                      <ul class="dropdown-menu dropdown-alerts">
+                          {% for i in Mensaje %}
+                          <li>
+                              <a href="#">
+                                  <div>
+                                      <i class="fa fa-envelope fa-fw"></i>
+                                      <span class="text-muted ">{{i.0|safe}}</span>
+                                      <span class="pull-right text-muted small">{{ i.1 }}</span>
+
+                                  </div>
+                              </a>
+                          </li>
+                          {% endfor %}
+                          <li class="divider"></li>
+                          <a id="borrar"><strong class="center-text">Borrar Notificaciones</strong></a>
+                      </ul>
+                    {% endwith %}
+                    {% endwith %}
                 </li>
-
-
                 <li>
                     <a href="{% url 'login' %}">
                         <i class="fa fa-sign-out"></i> Cerrar Sesión
                     </a>
                 </li>
-
             </ul>
-
         </nav>
         </div>
 

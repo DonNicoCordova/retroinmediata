@@ -6,7 +6,7 @@ from .models import Thread, Comment, CommentArchive, Post
 class ThreadForms(forms.ModelForm):
     class Meta:
         model = Thread
-        widgets = {'name': forms.NumberInput}
+        widgets = {'name': forms.TextInput(attrs={'class': 'form-control'})}
         fields = ('name',)
 
 

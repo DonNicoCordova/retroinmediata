@@ -136,24 +136,37 @@
       <div id="commentaries" {% if searchFilter == '' %} style="display: none"{% endif %}>
         <div class="col-lg-12 animated fadeInRight">
           <div class="wrapper wrapper-content">
-          {% if request|PrivilegeCreateThread:section.pk %}
+          {% with request|PrivilegeCreateThread:section.pk as crearHilo %}
             <div class="col-md-12">
               <form action="{% url 'section_details' section.pk %}" class="form-horizontal" method="get">
-                <div class="form-group col-md-8">
-                  <input type="text" name="search" id="id_search" class="form-control" placeholder="Buscar..." value="{{searchFilter|cut:'&search='}}">
+                <div class="form-group col-md-6">
+                  <input type="text" name="search" id="id_search" class="form-control" placeholder="Buscar..." value="{{ searchinput }}">
                 </div>
-                <div class="col-md-2">
+              <div class="col-md-2">
+                  <select name="order" id="id_order" class="form-control">
+                    {% if order == '-rank' %}
+                      <option value="-rank" selected>Ranking Ascendente</option>
+                      <option value="rank">Ranking Descendente</option>
+                    {% else %}
+                      <option value="-rank">Ranking Ascendente</option>
+                      <option value="rank" selected>Ranking Descendente</option>
+                    {% endif %}
+                  </select>
+              </div>
+                <div class="{% if crearHilo %}col-md-2{% else %}col-md-4{% endif %}">
                   <button type="submit" class="btn btn-success btn-block"><i class="fa fa-search"></i> Buscar</button>
                 </div>
+                {% if crearHilo %}
                 <div class="col-md-2">
                   <button type="button" class="btn btn-primary btn-block" data-toggle="modal" data-target="#addThread"><i class="fa fa-plus"></i> Crear Hilo</button>
                 </div>
+              {% endif %}
               </form>
             </div>
-          {% endif %}
+          {% endwith %}
             <div class="col-md-12">
               {% for x in threadpage %}
-                <div class="vote-item">
+                <div class="vote-item aaaa" data-pk="{{ x.pk }}">
                     <div class="row">
                         <div class="col-md-10">
                             <div class="vote-actions">
@@ -171,7 +184,13 @@
                             <div class="vote-info">
                                 <i class="fa fa-question-circle-o"></i> <a href="#">Preguntas ({{ x.post_set.all.count }})</a>
                                 <i class="fa fa-clock-o"></i> <a href="#">{% with x.getDiference as difference %} {{ difference }} {% if difference == 1 %}Hora{% else %}Horas{% endif %} atrás {% endwith %}</a>
-  {#                                <i class="fa fa-user"></i> <a href="#">Andrew Williams</a>#}
+                                <span class="seguirHilo">
+                                  {% if x.pk in follow %}
+                                  <i class="fa fa-arrow-right"></i> <a href="#">Seguir el hilo</a>
+                                  {% else %}
+                                    <i class="fa fa-times"></i> <a href="#">Dejar de seguir el hilo</a>
+                                  {% endif %}
+                                </span>
                             </div>
                         </div>
                         <div class="col-md-2 ">
@@ -230,6 +249,7 @@
         <div class="modal-content">
           <form action="{% url 'section_details' section.pk %}" class="form-horizontal" method="post">
             {% csrf_token %}
+            <input type="text" id="id_action" name="action" value="createThread" class="hidden">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 <h4 class="modal-title">Modal title</h4>
@@ -258,6 +278,21 @@
 {% block javascript %}
 
 <script>
+    function getCookie(name){
+      var cookieValue = null;
+      if (document.cookie && document.cookie != ''){
+          var cookies = document.cookie.split(';');
+          for(var i = 0; i < cookies.length; i++){
+              var cookie = jQuery.trim(cookies[i]);
+
+              if(cookie.substring(0,name.length + 1) == (name + '=')){
+                  cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                  break;
+              }
+          }
+      }
+      return cookieValue
+    }
     $(document).ready(function(){
         var actual = "#information"
         $("#comment_tab").click(function(){
@@ -274,6 +309,29 @@
                 actual = "#information"
             }
         });
+      $('.seguirHilo').on('click', function () {
+        let span = $(this);
+        let i = span.find('i');
+        let parent = $(this).parents().eq(3);
+        $.ajax({
+          url:'{% url "section_details" section.pk %}',
+          type: "POST",
+          data: {
+            csrfmiddlewaretoken: getCookie('csrftoken'),
+            action: 'followThread',
+            pk: parent.data('pk'),
+          },
+          success: function() {
+            if (i.hasClass('fa-arrow-right')){
+              i.removeClass('fa-arrow-right').addClass('fa-times');
+              span.find('a').text('Degar de seguir el hilo');
+            }else{
+              i.removeClass('fa-times').addClass('fa-arrow-right');
+              span.find('a').text('Seguir el hilo');
+            }
+          }
+        });
+      });
     });
     {% if not threadform %}
       $("#addThread").modal()

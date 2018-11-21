@@ -34,7 +34,7 @@
     {% endfor %}
     {% endif %}
     </div>
-    {% for section in sections%}
+    {% for section in sections %}
     <div class="col-lg-6 col-md-6 col-xs-12">
         {% if section.0.section_type == "CA" %}
         <div class="panel panel-success">
@@ -52,33 +52,34 @@
                                 {% if section.0.section_type == "CA" %}
                                 <dt>Tipo:</dt> <dd><span class="label label-primary">Catedra</span></dd>
                                 {% else %}
-                                <dt>Tipo:</dt> <dd><span class="label label-warning">Ayudantia</span></dd>
+{#                                <dt>Tipo:</dt> <dd><span class="label label-warning">Ayudantia</span></dd>#}
+                                <dt>Tipo:</dt> <dd><span class="label label-warning">Por Definir</span></dd>
                                 {% endif %}
-                                <dt>Docente:</dt> <dd>{{section.0.teacher.name}}</dd>
+                                <dt>Docente:</dt> <dd>{{section.teacher.user.first_name}} {{section.teacher.user.last_name}}</dd>
                             </div>
                             <div class="col-xs-6 col-md-12 col-lg-12">
-                                <dt>Código Asignatura:</dt> <dd>{{section.0.subject.subject_code}}</dd>
-                                <dt>Nrc:</dt> <dd>{{section.0.nrc}}</dd>
+                                <dt>Código Asignatura:</dt> <dd> {{ section.careersubjectsection.subject.name }} / {{ section.careersubjectsection.subject.subject_code }}</dd>
+                                <dt>Nrc:</dt> <dd>{{section.nrc}}</dd>
                             </div>
                         </dl>
                     </div>
-                    <div class="col-xs-12 col-md-12 col-lg-12 horarios">
-                        <h3 style="text-align:center;padding-top:2%">Horarios:</h3>
-                        <hr style="margin-top:1px">
-                        <dl class="dl-horizontal">
-                            {% if section.1 == "Sin Horario" %}
-                            <p>{{section.1}}</p>
-                            {% else %}
-                                {% for schedule in section.1 %}
-                                <dt>{{schedule.0}}:</dt> <dd>{{schedule.1}} ({{schedule.2}})</dd>
-                                {% endfor %}
-                            {% endif %}
-                        </dl>
-                    </div>
+{#                    <div class="col-xs-12 col-md-12 col-lg-12 horarios">#}
+{#                        <h3 style="text-align:center;padding-top:2%">Horarios:</h3>#}
+{#                        <hr style="margin-top:1px">#}
+{#                        <dl class="dl-horizontal">#}
+{#                            {% if section.1 == "Sin Horario" %}#}
+{#                            <p>{{section.1}}</p>#}
+{#                            {% else %}#}
+{#                                {% for schedule in section.1 %}#}
+{#                                <dt>{{schedule.0}}:</dt> <dd>{{schedule.1}} ({{schedule.2}})</dd>#}
+{#                                {% endfor %}#}
+{#                            {% endif %}#}
+{#                        </dl>#}
+{#                    </div>#}
                 </div>
             </div>
             <div class="panel-footer">
-                <a class="btn btn-primary btn-rounded btn-block" href="{% url 'section_details' section.0.pk %}"><i class="fa fa-eye"></i> Punto de encuentro</a>
+                <a class="btn btn-primary btn-rounded btn-block" href="{% url 'section_details' section.pk %}"><i class="fa fa-eye"></i> Punto de encuentro</a>
             </div>
         </div>
     </div>
