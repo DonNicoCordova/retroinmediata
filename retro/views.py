@@ -10,7 +10,7 @@ from retro.models import CommentRanking, ThreadRanking, ThreadFollower, PostFoll
 from django.db.models import Q
 from retro_auth.models import UserProfile
 from .models import Section, Thread, Comment, CommentArchive, Post
-from .forms import ThreadForms, PostForms, post_form, post_form_document
+from .forms import ThreadForms, PostForms, PostForm, PostFormDocument
 from alertas.models import Alerta, AnswerReport
 import re
 from django.db.models import Q, Avg
@@ -28,32 +28,31 @@ module_dict = {"D1": "08:30 - 10:10", "D2": "10:20 - 12:00",
                "V1": "17:00 - 18:40", "V2": "18:50 - 20:30",
                "V3": "20:40 - 22:20"}
 
-
 def coincidencia(nuevo_post,Thread):
-    
+
     lista = []
     lista2= []
     aux=[]
     repetido = []
-    
+
     #se traen los post y se pasan a mayuscula para poder comparar
     for x in Post.objects.filter(thread = Thread):
         lista.append(x.title.upper())
-    
+
     # keywords_2 sera el post recibido
     keywords_2 = nuevo_post.upper()
-    
+
     #se pasa el post a pequeñas listas
     key3 = keywords_2.split(" ")
 
     # agrega las preguntas a una lista
     for i in lista:
         lista2.append(i.split(" "))
-        
-    #compara las palabras del nuevo post con las preguntas de todos los post 
+
+    #compara las palabras del nuevo post con las preguntas de todos los post
     # en vase a un porcentaje mayor a 65% de coincidencia
     # agregar filtro de preguntas de un hilo
-    
+
     for palubria in lista2:
         repetido = []
         aux=[]
@@ -66,22 +65,20 @@ def coincidencia(nuevo_post,Thread):
 
             elif len(palubria)==1 and palubria == aux:
                 return([True,palubria])
-                
+
         porcentaje1 = 100*len(repetido)/len(key3) #66.6%
         print(porcentaje1)
 
         if porcentaje1 > 65:
             # data para html para mostrar alerta de coincidencia
             return([True,palubria])
-        
-    return([False,""])
 
+    return([False,""])
 
 @login_required(login_url='/auth/login/')
 def index(request):
     template_name = "index.html"
     return render(request, template_name, {'sections': Section.objects.filter(Q(teacher=request.user.userprofile) | Q(student__student=request.user.userprofile)).distinct()})
-
 
 @login_required(login_url='/auth/login/')
 def section_details(request, pk):
@@ -135,7 +132,6 @@ def section_details(request, pk):
         return HttpResponseRedirect(reverse('index'))
 
     return render(request, template_name, data)
-
 
 def thread_details(request, pk):
     template_name = "thread_details.html"
@@ -193,7 +189,6 @@ def thread_details(request, pk):
         return HttpResponseRedirect(reverse('index'))
     return render(request, template_name, data)
 
-
 def post_details(request, pk):
     template_name = "post_details.html"
     userprofile = request.user.userprofile
@@ -204,23 +199,23 @@ def post_details(request, pk):
         listcommentranks = []
 
         for i in allcomments:
-            rankingSum = 0
-            rankingAvg = 0.0
-            numRatings = 0
+            rankingsum = 0
+            rankingavg = 0.0
+            numratings = 0
             rankings = CommentRanking.objects.filter(comment=i)
 
             for j in rankings:
-                rankingSum += j.rating
-                numRatings += 1
+                rankingsum += j.rating
+                numratings += 1
 
-            if (numRatings != 0):
-                rankingAvg = rankingSum / numRatings
+            if (numratings != 0):
+                rankingavg = rankingsum / numratings
 
             try:
                 file = CommentArchive.objects.get(comment=i)
-                listcommentranks.append(tuple((i, round(rankingAvg, 1), file)))
+                listcommentranks.append(tuple((i, round(rankingavg, 1), file)))
             except:
-                listcommentranks.append(tuple((i, round(rankingAvg, 1), "")))
+                listcommentranks.append(tuple((i, round(rankingavg, 1), "")))
         data['Comments'] = listcommentranks
         data['post'] = post
 
@@ -236,30 +231,30 @@ def post_details(request, pk):
                     return JsonResponse({})
 
                 if request.POST['rtype']=='sort':
-                    sortedList = []
+                    sortedlist = []
                     if request.POST['order']=='Ascending':
-                        sortedList = sorted(listcommentranks,key=lambda t: t[1])
+                        sortedlist = sorted(listcommentranks,key=lambda t: t[1])
                     elif request.POST['order']=='Descending':
-                        sortedList = sorted(listcommentranks,reverse=True, key=lambda t: t[1])
-                    dictAnswersSorted = {}
+                        sortedlist = sorted(listcommentranks,reverse=True, key=lambda t: t[1])
+                    dictanswerssorted = {}
 
-                    for index,items in enumerate(sortedList, start=1):
-                        dictAnswersSorted[index] = {}
-                        dictAnswersSorted[index]["pk"] = items[0].pk
-                        dictAnswersSorted[index]["description"] = items[0].description
-                        dictAnswersSorted[index]["authorPk"] = items[0].author.pk
-                        dictAnswersSorted[index]["authorName"] = '%s %s' % (items[0].author.user.first_name, items[0].author.user.last_name)
-                        dictAnswersSorted[index]["publish_date"] = items[0].publish_date
-                        dictAnswersSorted[index]["file"] = items[2]
+                    for index,items in enumerate(sortedlist, start=1):
+                        dictanswerssorted[index] = {}
+                        dictanswerssorted[index]["pk"] = items[0].pk
+                        dictanswerssorted[index]["description"] = items[0].description
+                        dictanswerssorted[index]["authorPk"] = items[0].author.pk
+                        dictanswerssorted[index]["authorName"] = '%s %s' % (items[0].author.user.first_name, items[0].author.user.last_name)
+                        dictanswerssorted[index]["publish_date"] = items[0].publish_date
+                        dictanswerssorted[index]["file"] = items[2]
                         if(items[2]!=""):
-                            dictAnswersSorted[index]["file"] = items[2].pk
-                            dictAnswersSorted[index]["fileDocument"] = items[2].document.name
+                            dictanswerssorted[index]["file"] = items[2].pk
+                            dictanswerssorted[index]["fileDocument"] = items[2].document.name
                         else:
-                            dictAnswersSorted[index]["file"] = ""
-                        dictAnswersSorted[index]["rating"] = items[1]
+                            dictanswerssorted[index]["file"] = ""
+                        dictanswerssorted[index]["rating"] = items[1]
                         print(items[0].author.user)
-                        print(dictAnswersSorted[index])
-                    return JsonResponse(dictAnswersSorted)
+                        print(dictanswerssorted[index])
+                    return JsonResponse(dictanswerssorted)
 
                 if request.POST['rtype']=='rate':
                     if CommentRanking.objects.filter(userprofile=userprofile.id, comment=request.POST["comment"]).exists():
@@ -273,20 +268,20 @@ def post_details(request, pk):
                     dictRatings = {}
 
                     for i in comments:
-                        rankingSum = 0
-                        rankingAvg = 0.0
-                        numRatings = 0
+                        rankingsum = 0
+                        rankingavg = 0.0
+                        numratings = 0
                         rankings = CommentRanking.objects.filter(comment=i)
 
                         for j in rankings:
-                            rankingSum += j.rating
-                            numRatings += 1
-                        if (numRatings != 0):
-                            rankingAvg = rankingSum / numRatings
-                            dictRatings[i.pk] = round(rankingAvg, 1)
+                            rankingsum += j.rating
+                            numratings += 1
+                        if (numratings != 0):
+                            rankingavg = rankingsum / numratings
+                            dictRatings[i.pk] = round(rankingavg, 1)
                     return JsonResponse(dictRatings)
             else:
-                data['form'] = post_form(request.POST)
+                data['form'] = PostForm(request.POST)
                 if data['form'].is_valid():
                     new_comment = Comment(post=post, description=request.POST['description'],
                                           author=userprofile)
@@ -297,13 +292,12 @@ def post_details(request, pk):
                     return HttpResponseRedirect(reverse('post_details', kwargs={'pk': pk}))
                 print(data['form'].errors)
         else:
-            data['form'] = post_form()
-            data['form_arch'] = post_form_document()
+            data['form'] = PostForm()
+            data['form_arch'] = PostFormDocument()
     else:
         messages.error(request, 'No existe la pregunta.')
         return HttpResponseRedirect(reverse('index'))
     return render(request, template_name, data)
-
 
 def create_comment_archives(new_comment, File):
     try:
@@ -343,7 +337,6 @@ def comment_post(request):
     else:
         return HttpResponseRedirect(reverse('index'))
 
-
 @csrf_exempt
 def delete_post(request):
     data = {}
@@ -353,7 +346,6 @@ def delete_post(request):
     Post.objects.get(pk=post_id).delete()
     return JsonResponse({'message': 'ok'})
 
-
 @csrf_exempt
 def delete_comment(request):
     data = {}
@@ -362,11 +354,8 @@ def delete_comment(request):
     return JsonResponse({'message': 'ok'})
 
 def delete_imag(request):
-    data = {}
-    print("holi")
-    archive = CommentArchive.objects.get(pk=request.POST["pk"]).delete()
+    CommentArchive.objects.get(pk=request.POST["pk"]).delete()
     return JsonResponse({'message': 'ok'})
-
 
 @csrf_exempt
 def frequent_questions_student(request):
@@ -379,7 +368,6 @@ def frequent_questions_teacher(request):
 	data={}
 	template_name = "frequent_questions_teacher.html"
 	return render(request, template_name,data)
-
 
 def update_comment(request):
     data = {}
