@@ -67,8 +67,7 @@ def coincidencia(nuevo_post,Thread):
             elif len(palubria)==1 and palubria == aux:
                 return([True,palubria])
                 
-        porcentaje1 = 100*len(repetido)/len(key3) #66.6%
-        print(porcentaje1)
+        porcentaje1 = 100*len(repetido)/len(key3) 
 
         if porcentaje1 > 65:
             # data para html para mostrar alerta de coincidencia
@@ -150,7 +149,6 @@ def thread_details(request, pk):
                 data['postform'] = PostForms(request.POST)
                 if data['postform'].is_valid():
                     a = coincidencia(request.POST["title"],thread)
-                    print(a)
                     if a[0] == True:
                         frase = ' '.join(a[1])
                         data['postparecido']=1
@@ -257,8 +255,7 @@ def post_details(request, pk):
                         else:
                             dictAnswersSorted[index]["file"] = ""
                         dictAnswersSorted[index]["rating"] = items[1]
-                        print(items[0].author.user)
-                        print(dictAnswersSorted[index])
+
                     return JsonResponse(dictAnswersSorted)
 
                 if request.POST['rtype']=='rate':
@@ -292,10 +289,10 @@ def post_details(request, pk):
                                           author=userprofile)
                     new_comment.save()
                     if request.FILES:
-                        print(request.FILES)
+
                         create_comment_archives(new_comment, request.FILES['document'])
                     return HttpResponseRedirect(reverse('post_details', kwargs={'pk': pk}))
-                print(data['form'].errors)
+
         else:
             data['form'] = post_form()
             data['form_arch'] = post_form_document()
@@ -363,7 +360,6 @@ def delete_comment(request):
 
 def delete_imag(request):
     data = {}
-    print("holi")
     archive = CommentArchive.objects.get(pk=request.POST["pk"]).delete()
     return JsonResponse({'message': 'ok'})
 
@@ -393,7 +389,6 @@ def update_comment(request):
 
 def update_post(request):
     data = {}
-    print(request.POST)
     post_id = request.POST["pk"]
     post = Post.objects.get(pk=post_id)
     post.title = request.POST['title']
