@@ -28,7 +28,7 @@ class Career(models.Model):
 class CareerSubjectSection(models.Model):
     career = models.ForeignKey('Career', on_delete=models.CASCADE)
     subject = models.ForeignKey('Subject', on_delete=models.CASCADE)
-    section = models.ForeignKey('Section', on_delete=models.CASCADE)
+    section = models.OneToOneField('Section', on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (('career', 'subject', 'section'),)
@@ -50,6 +50,9 @@ class Section(models.Model):
     teacher = models.ForeignKey(UserProfile, blank=True, null=True, on_delete=models.SET_NULL)
     nrc = models.CharField(max_length=6, default="NoNRC")
     status = models.BooleanField(default=True)
+
+    def addStudent(self, id_student):
+        return Student.objects.create(section=self, student_id=id_student)
 
     def __str__(self):
         return self.nrc

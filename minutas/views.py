@@ -20,14 +20,13 @@ def minutas(request):
         redirect('minutas')
     if request.method == "POST":
         data['form'] = RefuseMinutes(request.POST)
-
-
         if data['form'].is_valid():
             # aca el formulario valido
             minuta = Minute.objects.get(pk=request.POST["pk"])
 
             obj = data['form'].save(commit = False)
             obj.minute = minuta
+            userprofiles = UserProfile.objects.get(user = request.user)
             obj.userprofile = userprofiles
             obj.save()
     else:

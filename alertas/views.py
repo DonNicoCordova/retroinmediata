@@ -1,5 +1,5 @@
 from alertas.forms import *
-from retro_auth.models  import *
+from retro_auth.models import *
 from retro.models import *
 from django.http import HttpResponseRedirect
 from django.urls import reverse
