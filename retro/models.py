@@ -51,6 +51,9 @@ class Section(models.Model):
     nrc = models.CharField(max_length=6, default="NoNRC")
     status = models.BooleanField(default=True)
 
+    def addStudent(self, id_student):
+        return Student.objects.create(section=self, student_id=id_student)
+
     def __str__(self):
         return self.nrc
 

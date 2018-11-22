@@ -139,9 +139,20 @@
           {% with request|PrivilegeCreateThread:section.pk as crearHilo %}
             <div class="col-md-12">
               <form action="{% url 'section_details' section.pk %}" class="form-horizontal" method="get">
-                <div class="form-group col-md-8">
-                  <input type="text" name="search" id="id_search" class="form-control" placeholder="Buscar..." value="{{searchFilter|cut:'&search='}}">
+                <div class="form-group col-md-6">
+                  <input type="text" name="search" id="id_search" class="form-control" placeholder="Buscar..." value="{{ searchinput }}">
                 </div>
+              <div class="col-md-2">
+                  <select name="order" id="id_order" class="form-control">
+                    {% if order == '-rank' %}
+                      <option value="-rank" selected>Ranking Ascendente</option>
+                      <option value="rank">Ranking Descendente</option>
+                    {% else %}
+                      <option value="-rank">Ranking Ascendente</option>
+                      <option value="rank" selected>Ranking Descendente</option>
+                    {% endif %}
+                  </select>
+              </div>
                 <div class="{% if crearHilo %}col-md-2{% else %}col-md-4{% endif %}">
                   <button type="submit" class="btn btn-success btn-block"><i class="fa fa-search"></i> Buscar</button>
                 </div>
